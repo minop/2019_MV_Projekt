@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.example.messagingappmv.R
+import com.example.messagingappmv.databinding.FragmentContactListBinding
 
 class ContactListFragment : Fragment() {
     override fun onCreateView(
@@ -12,6 +15,10 @@ class ContactListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+
+        val binding: FragmentContactListBinding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_contact_list, container, false)
+
+        return binding.root
     }
 }
