@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="user_contact"
+            type="com.example.messagingappmv.database.UserContact"/>
+        <variable
+            name="clickListener"
+            type="com.example.messagingappmv.screens.contact_list.ContactListListener" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:onClick="@{() -> clickListener.onClick(user_contact)}"
+        android:padding="7dp">
+
+        <TextView
+            android:id="@+id/user_name_string"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:nameString="@{user_contact}"
+            tools:text="@string/textMessage" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
