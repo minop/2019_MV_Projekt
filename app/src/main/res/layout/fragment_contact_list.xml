@@ -29,18 +29,17 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/user_contact_list"
             android:layout_width="350dp"
-            android:layout_height="481dp"
+            android:layout_height="0dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="62dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="42dp"
-            android:layout_marginBottom="44dp"
+            android:layout_marginBottom="10dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/editTextMessage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/clear_button"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/clear_button" />
 
         <Button
             android:id="@+id/start_button"
@@ -48,7 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="29dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/start"
+            android:text="@string/send"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -61,20 +61,22 @@
             android:layout_marginEnd="49dp"
             android:onClick="@{() -> contactListViewModel.onClear()}"
             android:text="@string/clear"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/editTextMessage"
-            android:layout_width="271dp"
+            android:layout_width="0dp"
             android:layout_height="41dp"
-            android:layout_marginStart="7dp"
+            android:layout_marginStart="10dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="@string/textMessage"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/start_button"
             app:layout_constraintStart_toStartOf="parent" />

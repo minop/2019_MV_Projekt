@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.messagingappmv.MainActivity
 import com.example.messagingappmv.database.UserContactDatabase
 import com.example.messagingappmv.R
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +37,7 @@ class ContactListFragment : Fragment() {
             inflater, R.layout.fragment_contact_list, container, false)
 
         val application = requireNotNull(this.activity).application
+        (activity as MainActivity).supportActionBar?.title = getString(R.string.contact_list_title)
 
         // Create an instance of the ViewModel Factory.
         val dataSource = UserContactDatabase.getInstance(application).userContactDatabaseDao

@@ -10,3 +10,9 @@ fun TextView.setNameString(item: UserContact?) {
         text = item.user_name
     }
 }
+@BindingAdapter("firstLetterName")
+fun TextView.setfirstLetterNameString(item: UserContact?) {
+    item?.let {
+        text = item.user_name.get(0).toString()
+    }
+}
