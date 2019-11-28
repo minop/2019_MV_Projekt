@@ -29,11 +29,11 @@ import com.example.messagingappmv.database.UserContact
  * Defines methods for using the UserContactList class with Room.
  */
 @Dao
-interface UserContactDatabaseDao {
+interface UserMessagesDatabaseDao {
 
     @Insert
-    fun insert(contact: UserContact)
-    
+    fun insert(contact: UserMessages)
+
     /**
      * When updating a row with a value already set in a column,
      * replaces the old value with the new one.
@@ -41,22 +41,22 @@ interface UserContactDatabaseDao {
      * @param contact new value to write
      */
     @Update
-    fun update(contact: UserContact)
+    fun update(contact: UserMessages)
 
     /**
      * Selects and returns the row that matches the supplied start time, which is our key.
      *
      * @param key startTimeMilli to match
      */
-    @Query("SELECT * from user_contact_list WHERE user_id = :key")
-    fun get(key: Long): UserContact
+    @Query("SELECT * from user_messages WHERE user_id = :key")
+    fun get(key: Long): UserMessages
 
     /**
      * Deletes all values from the table.
      *
      * This does not delete the table, only its contents.
      */
-    @Query("DELETE FROM user_contact_list")
+    @Query("DELETE FROM user_messages")
     fun clear()
 
     /**
@@ -64,18 +64,20 @@ interface UserContactDatabaseDao {
      *
      * sorted by start time in descending order.
      */
-    @Query("SELECT * FROM user_contact_list ORDER BY user_id DESC")
-    fun getAllUserContact(): LiveData<List<UserContact>>
+    @Query("SELECT * FROM user_messages ORDER BY user_id DESC")
+    fun getAllUserMessages(): LiveData<List<UserMessages>>
 
     /**
      * Selects and returns the latest record.
      */
-    @Query("SELECT * FROM user_contact_list ORDER BY user_id DESC LIMIT 1")
-    fun getUserContact(): UserContact?
+    @Query("SELECT * FROM user_messages ORDER BY user_id DESC LIMIT 1")
+    fun getUserMessage(): UserMessages?
 
     /**
      * Selects and returns the night with given Id.
      */
-    @Query("SELECT * from user_contact_list WHERE user_id = :key")
-    fun getUserContactListWithId(key: Long): LiveData<UserContact>
+    @Query("SELECT * from user_messages WHERE user_id = :key")
+    fun getUserMessageById(key: Long): LiveData<UserMessages>
+
+
 }

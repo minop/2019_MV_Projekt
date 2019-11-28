@@ -16,13 +16,14 @@ package com.example.messagingappmv.screens.chat
  * limitations under the License.
  */
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.messagingappmv.database.UserContact
-import com.example.messagingappmv.database.UserContactDatabaseDao
-
-import kotlinx.coroutines.Job
+import com.example.messagingappmv.database.UserMessages
+import com.example.messagingappmv.database.UserMessagesDatabaseDao
+import kotlinx.coroutines.*
 
 /**
  * ViewModel for SleepQualityFragment.
@@ -31,7 +32,8 @@ import kotlinx.coroutines.Job
  */
 class ChatViewModel(
     private val userContactKey: Long = 0L,
-    dataSource: UserContactDatabaseDao) : ViewModel() {
+    dataSource: UserMessagesDatabaseDao
+) : ViewModel() {
 
     val database = dataSource
 
@@ -42,49 +44,159 @@ class ChatViewModel(
      */
     private val viewModelJob = Job()
 
-    private val newUserContact: LiveData<UserContact>
+//    private val newUserContact: LiveData<UserMessages>
+//
+//    fun getNewUserContact() = newUserContact
+//
+//
+//    init {
+//        newUserContact=database.getUserMessagesById(userContactKey)
+//    }
 
-    fun getNewUserContact() = newUserContact
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
+    private var newUserMessages = MutableLiveData<UserMessages?>()
+
+    val allUserMessages = database.getAllUserMessages()
+
+    /**
+     * Request a toast by setting this value to true.
+     *
+     * This is private because we don't want to expose setting this value to the Fragment.
+     */
+    private var _showSnackbarEvent = MutableLiveData<Boolean?>()
+
+    /**
+     * If this is true, immediately `show()` a toast and call `doneShowingSnackbar()`.
+     */
+    val showSnackBarEvent: LiveData<Boolean?>
+        get() = _showSnackbarEvent
+
+
+    /**
+     * Call this immediately after calling `show()` on a toast.
+     *
+     * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
+     * toast.
+     */
+    fun doneShowingSnackbar() {
+        _showSnackbarEvent.value = null
+    }
+
+
+    /**
+     * Navigation for the Chat fragment.
+     */
+    private val _navigateToChat = MutableLiveData<Long>()
+    val navigateToChat
+        get() = _navigateToChat
+
+    fun onUserContactClicked(id: Long) {
+        _navigateToChat.value = id
+    }
+
+    fun onChatNavigated() {
+        _navigateToChat.value = null
+    }
 
     init {
-        newUserContact=database.getUserContactListWithId(userContactKey)
+        initializeUserContact()
+    }
+
+    private fun initializeUserContact() {
+        uiScope.launch {
+            newUserMessages.value = getUserMessageFromDatabase()
+        }
     }
 
     /**
-     * Variable that tells the fragment whether it should navigate to [SleepTrackerFragment].
+     *  Handling the case of the stopped app or forgotten recording,
+     *  the start and end times will be the same.j
      *
-     * This is `private` because we don't want to expose the ability to set [MutableLiveData] to
-     * the [Fragment]
+     *  If the start time and end time are not the same, then we do not have an unfinished
+     *  recording.
      */
-    private val _navigateToContactList = MutableLiveData<Boolean?>()
+    private suspend fun getUserMessageFromDatabase(): UserMessages? {
+        return withContext(Dispatchers.IO) {
+
+            var userMessage = database.getUserMessage()
+            if (userMessage?.user_name == userMessage?.user_name) {
+                userMessage = null
+            }
+            userMessage
+        }
+    }
+
+    private suspend fun insert(userMessage: UserMessages) {
+        withContext(Dispatchers.IO) {
+            database.insert(userMessage)
+        }
+    }
+
+    private suspend fun update(userMessage: UserMessages) {
+        withContext(Dispatchers.IO) {
+            database.update(userMessage)
+        }
+    }
+
+    private suspend fun clear() {
+        withContext(Dispatchers.IO) {
+            database.clear()
+        }
+    }
 
     /**
-     * When true immediately navigate back to the [SleepTrackerFragment]
+     * Executes when the START button is clicked.
      */
-    val navigateToContactList: LiveData<Boolean?>
-        get() = _navigateToContactList
+    fun onStart() {
+        uiScope.launch {
+            // Create a new night, which captures the current time,
+            // and insert it into the database.
+            val newMessage = UserMessages()
+            newMessage.user_name = "test"
+
+            insert(newMessage)
+
+            newUserMessages.value = getUserMessageFromDatabase()
+        }
+    }
+
+    fun onSend(message: String) {
+        uiScope.launch {
+            val newMessage = UserMessages()
+            newMessage.user_name = message
+            Log.d("Message", message)
+            insert(newMessage)
+            newUserMessages.value = getUserMessageFromDatabase()
+
+
+        }
+    }
 
     /**
-     * Cancels all coroutines when the ViewModel is cleared, to cleanup any pending work.
-     *
-     * onCleared() gets called when the ViewModel is destroyed.
+     * Executes when the CLEAR button is clicked.
+     */
+    fun onClear() {
+        uiScope.launch {
+            // Clear the database table.
+            clear()
+
+            // And clear tonight since it's no longer in the database
+            newUserMessages.value = null
+
+            // Show a snackbar message, because it's friendly.
+            _showSnackbarEvent.value = true
+        }
+    }
+
+    /**
+     * Called when the ViewModel is dismantled.
+     * At this point, we want to cancel all coroutines;
+     * otherwise we end up with processes that have nowhere to return to
+     * using memory and resources.
      */
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
     }
-
-
-    /**
-     * Call this immediately after navigating to [SleepTrackerFragment]
-     */
-    fun doneNavigating() {
-        _navigateToContactList.value = null
-    }
-
-    fun onClose() {
-        _navigateToContactList.value = true
-    }
-
 }

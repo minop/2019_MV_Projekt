@@ -30,13 +30,14 @@ import com.example.messagingappmv.database.UserContact
  * This pattern is pretty much the same for any database,
  * so you can reuse it.
  */
-@Database(entities = [UserContact::class], version = 1, exportSchema = false)
+@Database(entities = [UserContact::class, UserMessages::class], version = 2, exportSchema = false)
 abstract class UserContactDatabase : RoomDatabase() {
 
     /**
      * Connects the database to the DAO.
      */
     abstract val userContactDatabaseDao: UserContactDatabaseDao
+    abstract val userMessagesDatabaseDao: UserMessagesDatabaseDao
 
     /**
      * Define a companion object, this allows us to add functions on the UserContactDatabase class.
