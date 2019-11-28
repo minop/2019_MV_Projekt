@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">MessagingAppMV</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="clear">Clear</string>
+    <string name="start">Start</string>
+    <string name="textMessage">Default Name</string>
+    <string name="cleared_message">All your data is gone forever.</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="send">Send</string>
+    <string name="contact_list_title">Contact List</string>
+    <string name="chat_title">Messages</string>
+
 </resources>
