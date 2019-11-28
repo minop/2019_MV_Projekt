@@ -2,6 +2,8 @@ package com.example.messagingappmv.screens.chat
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -67,7 +69,7 @@ class ChatFragment : Fragment() {
 
         userMessagesViewModel.allUserMessages.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it)
+                adapter.addHeaderAndSubmitList(it)
                 user_messages.smoothScrollToPosition(0)
 
             }
@@ -94,6 +96,8 @@ class ChatFragment : Fragment() {
 
 
         val manager = LinearLayoutManager(activity)
+        manager.setReverseLayout(true)
+
         binding.userMessages.layoutManager = manager
         return binding.root
     }
@@ -102,9 +106,29 @@ class ChatFragment : Fragment() {
         send_button.setOnClickListener{
             Log.d("Message", "In Listener")
             userMessagesViewModel.onSend(editTextMessageChat.text.toString())
+
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
 
+
         }
+        editTextMessageChat.addTextChangedListener(
+            object : TextWatcher {
+
+                override fun afterTextChanged(s: Editable) {
+                    user_messages.smoothScrollToPosition(0)
+
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int,
+                                               count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int,
+                                           before: Int, count: Int) {
+                    user_messages.smoothScrollToPosition(0)
+                }
+            }
+        )
     }
 }

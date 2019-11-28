@@ -170,6 +170,7 @@ class ChatViewModel(
             newUserMessages.value = getUserMessageFromDatabase()
 
 
+
         }
     }
 
