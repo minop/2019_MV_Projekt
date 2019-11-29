@@ -25,9 +25,33 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "user_messages")
 data class UserMessages(
-        @PrimaryKey(autoGenerate = true)
-        var user_id: Long = 0L,
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0L,
 
-        @ColumnInfo(name = "username")
-        var user_name: String = ""
+    @ColumnInfo(name = "uid")
+    var uid: Long = 0L,
+
+    @ColumnInfo(name = "contact")
+    var contact_id: Long = 0L,
+
+    @ColumnInfo(name = "message")
+    var message: String = "",
+
+    @ColumnInfo(name = "time")
+    var time: String = "",
+
+    @ColumnInfo(name = "uid_name")
+    var uid_name: String = "",
+
+    @ColumnInfo(name = "contact_name")
+    var contact_name: String = "",
+
+    @ColumnInfo(name = "uid_fid")
+    var uid_fid: String = "",
+
+    @ColumnInfo(name = "contact_fid")
+    var contact_fid: String = ""
+
+//    @ColumnInfo(name = "username")
+//    var user_name: String = ""
 )

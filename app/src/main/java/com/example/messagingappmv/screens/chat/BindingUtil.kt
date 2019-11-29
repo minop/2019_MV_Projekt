@@ -7,12 +7,12 @@ import com.example.messagingappmv.database.UserMessages
 @BindingAdapter("nameString")
 fun TextView.setNameString(item: UserMessages?) {
     item?.let {
-        text = item.user_name
+        text = item.message
     }
 }
 @BindingAdapter("firstLetterName")
 fun TextView.setfirstLetterNameString(item: UserMessages?) {
     item?.let {
-        text = item.user_name.get(0).toString()
+        text = item.uid.toString()
     }
 }

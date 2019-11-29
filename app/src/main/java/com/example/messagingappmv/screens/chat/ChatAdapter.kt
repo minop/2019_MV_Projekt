@@ -1,23 +1,15 @@
 package com.example.messagingappmv.screens.chat
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.messagingappmv.R
-import com.example.messagingappmv.database.UserContact
 import com.example.messagingappmv.database.UserMessages
 import com.example.messagingappmv.databinding.ListItemChatContactBinding
 
 import com.example.messagingappmv.databinding.ListItemChatUserBinding
-import com.example.messagingappmv.databinding.ListItemUserContactBinding
-import kotlinx.android.synthetic.main.list_item_chat_user.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +35,7 @@ class ChatAdapter(val clickListener: ChatListener) :
         }
 //        holder.bind(getItem(position)!!, clickListener)
 //        val current_message = getItem(position!!)
-//        if(current_message.user_id == 1L){
+//        if(current_message.uid == 1L){
 //            holder.itemView.user_name_string.setBackgroundColor(Color.parseColor("#000000"))
 //        }
 //        holder.itemView.user_name_string.setBackgroundColor(Color.parseColor("#000000"))
@@ -81,7 +73,7 @@ class ChatAdapter(val clickListener: ChatListener) :
 //            is DataItem.ContactMessage -> ITEM_VIEW_TYPE_HEADER
 //            is DataItem.UserMessage -> ITEM_VIEW_TYPE_ITEM
 //        }
-        if(getItem(position).user_id == 66L){
+        if(getItem(position).uid == 8L){
             return ITEM_VIEW_TYPE_ITEM
         } else {
             return ITEM_VIEW_TYPE_HEADER
@@ -141,7 +133,7 @@ class ChatAdapter(val clickListener: ChatListener) :
 class ChatDiffCallback : DiffUtil.ItemCallback<DataItem>() {
 
     override fun areItemsTheSame(oldItem: DataItem, newItem: DataItem): Boolean {
-        return oldItem.user_id == newItem.user_id
+        return oldItem.id == newItem.id
     }
 
     @SuppressLint("DiffUtilEquals")
@@ -152,18 +144,21 @@ class ChatDiffCallback : DiffUtil.ItemCallback<DataItem>() {
 
 
 class ChatListener(val clickListener: (userId: Long) -> Unit) {
-    fun onClick(userMessages: UserMessages) = clickListener(userMessages.user_id)
+    fun onClick(userMessages: UserMessages) = clickListener(userMessages.id)
 }
 
 sealed class DataItem {
-    abstract val user_id: Long
+    abstract val id: Long
+    abstract val uid: Long
 
     data class UserMessage(val userMessage: UserMessages) : DataItem() {
-        override val user_id = userMessage.user_id
+        override val id = userMessage.id
+        override val uid = userMessage.uid
     }
 
     data class ContactMessage(val userMessage: UserMessages): DataItem() {
-        override val user_id = userMessage.user_id
+        override val id = userMessage.id
+        override val uid = userMessage.uid
     }
 }
 

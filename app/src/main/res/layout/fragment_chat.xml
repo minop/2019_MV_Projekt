@@ -22,6 +22,7 @@
  the whole ViewModel, so that we can access the LiveData,
  click handlers, and state variables. -->
     <data>
+
         <variable
             name="chatViewModel"
             type="com.example.messagingappmv.screens.chat.ChatViewModel" />
@@ -57,24 +58,24 @@
         <!--            app:sleepDurationFormatted="@{sleepDetailViewModel.night}" />-->
 
         <!--        <Button-->
-<!--            android:id="@+id/send_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="29dp"-->
-<!--            android:layout_marginBottom="16dp"-->
-<!--            android:text="@string/send"-->
-<!--            android:visibility="visible"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent" />-->
+        <!--            android:id="@+id/send_button"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginEnd="29dp"-->
+        <!--            android:layout_marginBottom="16dp"-->
+        <!--            android:text="@string/send"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent" />-->
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/user_messages"
-            android:layout_width="368dp"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
-            android:layout_marginEnd="42dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginBottom="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/send_button"
@@ -86,14 +87,16 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/send_button"
-            android:layout_width="wrap_content"
+            android:layout_width="56dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_marginEnd="29dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginBottom="16dp"
             app:backgroundTint="#3F51B5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/editTextMessageChat"
             app:srcCompat="@drawable/ic_send_24pxwhite" />
 
         <Button
@@ -108,65 +111,90 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-<!--        android:onClick="@{() -> contactListViewModel.onClear()}"-->
+        <!--        android:onClick="@{() -> contactListViewModel.onClear()}"-->
 
 
         <EditText
             android:id="@+id/editTextMessageChat"
             android:layout_width="0dp"
-            android:layout_height="41dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="20dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="@string/textMessage"
-            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxHeight="300dp"
+            android:maxLines="5"
+            android:minWidth="270dp"
+            android:minLines="1"
+            android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/send_button"
-            app:layout_constraintStart_toStartOf="parent" />
-
-<!--        <TextView-->
-<!--            android:id="@+id/textView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="177dp"-->
-<!--            android:layout_marginTop="27dp"-->
-<!--            android:layout_marginEnd="176dp"-->
-<!--            android:text="Messages for user: "-->
-<!--            android:visibility="visible"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/name_string"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="20dp"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:layout_marginTop="25dp"-->
-<!--            android:layout_marginEnd="20dp"-->
-<!--            android:minWidth="50dp"-->
-<!--            android:visibility="visible"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.498"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
-<!--        />-->
-<!--        app:nameString="@{chatViewModel.newUserContact}"-->
+            app:layout_constraintEnd_toStartOf="@id/send_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_messages" />
 
 
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginBottom="32dp"-->
-<!--            android:onClick="@{() -> chatViewModel.onClose()}"-->
-<!--            android:text="@string/back"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
+        <!--        <EditText-->
+        <!--            android:id="@+id/editTextMessageChat"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="32dp"-->
+        <!--            android:layout_marginTop="5dp"-->
+        <!--            android:layout_marginEnd="10dp"-->
+        <!--            android:layout_marginBottom="5dp"-->
+        <!--            android:ems="10"-->
+        <!--            android:inputType="textAutoCorrect|textMultiLine|textPersonName|textImeMultiLine"-->
+        <!--            android:maxLength="100"-->
+        <!--            android:maxLines="5"-->
+        <!--            android:singleLine="false"-->
+        <!--            android:text="@string/textMessage"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toStartOf="@+id/send_button"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/user_messages" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/textView"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="177dp"-->
+        <!--            android:layout_marginTop="27dp"-->
+        <!--            android:layout_marginEnd="176dp"-->
+        <!--            android:text="Messages for user: "-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/name_string"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="20dp"-->
+        <!--            android:layout_marginStart="20dp"-->
+        <!--            android:layout_marginTop="25dp"-->
+        <!--            android:layout_marginEnd="20dp"-->
+        <!--            android:minWidth="50dp"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintHorizontal_bias="0.498"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
+        <!--        />-->
+        <!--        app:nameString="@{chatViewModel.newUserContact}"-->
+
+
+        <!--        <Button-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="8dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            android:layout_marginBottom="32dp"-->
+        <!--            android:onClick="@{() -> chatViewModel.onClose()}"-->
+        <!--            android:text="@string/back"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

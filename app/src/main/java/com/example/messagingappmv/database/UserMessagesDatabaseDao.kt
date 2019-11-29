@@ -48,7 +48,7 @@ interface UserMessagesDatabaseDao {
      *
      * @param key startTimeMilli to match
      */
-    @Query("SELECT * from user_messages WHERE user_id = :key")
+    @Query("SELECT * from user_messages WHERE uid = :key")
     fun get(key: Long): UserMessages
 
     /**
@@ -64,19 +64,19 @@ interface UserMessagesDatabaseDao {
      *
      * sorted by start time in descending order.
      */
-    @Query("SELECT * FROM user_messages ORDER BY user_id DESC")
+    @Query("SELECT * FROM user_messages ORDER BY id DESC")
     fun getAllUserMessages(): LiveData<List<UserMessages>>
 
     /**
      * Selects and returns the latest record.
      */
-    @Query("SELECT * FROM user_messages ORDER BY user_id DESC LIMIT 1")
+    @Query("SELECT * FROM user_messages ORDER BY id DESC LIMIT 1")
     fun getUserMessage(): UserMessages?
 
     /**
      * Selects and returns the night with given Id.
      */
-    @Query("SELECT * from user_messages WHERE user_id = :key")
+    @Query("SELECT * from user_messages WHERE uid = :key")
     fun getUserMessageById(key: Long): LiveData<UserMessages>
 
 

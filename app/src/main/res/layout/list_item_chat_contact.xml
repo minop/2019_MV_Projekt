@@ -14,37 +14,27 @@
     </data>
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:onClick="@{() -> clickListener.onClick(chat)}"
-        android:padding="7dp">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/user_name_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_margin="5dp"
             android:background="@drawable/oval_for_one_message_pink"
-            android:foregroundGravity="center_vertical|center|center_horizontal"
-            android:gravity="center|center_horizontal|center_vertical"
-            android:padding="5dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textAlignment="center"
+            android:hapticFeedbackEnabled="true"
+            android:padding="7dp"
+            android:textAlignment="textStart"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="italic"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.973"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:nameString="@{chat}"
-            tools:text="@string/app_name" />
+            tools:text="@string/long_message_test" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 </layout>

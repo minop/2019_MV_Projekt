@@ -120,7 +120,7 @@ class ChatViewModel(
         return withContext(Dispatchers.IO) {
 
             var userMessage = database.getUserMessage()
-            if (userMessage?.user_name == userMessage?.user_name) {
+            if (userMessage?.id == userMessage?.id) {
                 userMessage = null
             }
             userMessage
@@ -153,7 +153,7 @@ class ChatViewModel(
             // Create a new night, which captures the current time,
             // and insert it into the database.
             val newMessage = UserMessages()
-            newMessage.user_name = "test"
+            newMessage.uid = 8
 
             insert(newMessage)
 
@@ -164,7 +164,9 @@ class ChatViewModel(
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
-            newMessage.user_name = message
+            newMessage.uid = 8
+            newMessage.message = message
+
             Log.d("Message", message)
             insert(newMessage)
             newUserMessages.value = getUserMessageFromDatabase()
