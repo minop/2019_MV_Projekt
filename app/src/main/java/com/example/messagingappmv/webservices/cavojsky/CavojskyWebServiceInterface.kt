@@ -2,8 +2,8 @@ package com.example.messagingappmv.webservices.cavojsky
 
 import com.example.messagingappmv.webservices.cavojsky.requestbodies.*
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.*
-import retrofit.Call
-import retrofit.http.POST
+import retrofit2.Call
+import retrofit2.http.POST
 
 interface CavojskyWebServiceInterface {
 
