@@ -1,6 +1,7 @@
 package com.example.messagingappmv.webservices.cavojsky
 
 import android.content.Context
+import com.example.messagingappmv.webservices.cavojsky.interceptors.AuthInterceptor
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenAuthenticator
 import com.example.messagingappmv.webservices.cavojsky.requestbodies.RefreshRequest
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RefreshResponse
@@ -14,6 +15,7 @@ object CavojskyWebService {
 
     private fun create(context: Context) : CavojskyWebServiceInterface {
         val httpClient = OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(context))
             .authenticator(TokenAuthenticator(context))
             .build()
 
