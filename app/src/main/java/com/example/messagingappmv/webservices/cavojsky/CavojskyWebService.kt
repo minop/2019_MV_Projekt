@@ -5,14 +5,8 @@ import com.example.messagingappmv.webservices.cavojsky.interceptors.AuthIntercep
 import com.example.messagingappmv.webservices.cavojsky.interceptors.LoginData
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenAuthenticator
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
-import com.example.messagingappmv.webservices.cavojsky.requestbodies.LoginRequest
-import com.example.messagingappmv.webservices.cavojsky.requestbodies.RefreshRequest
-import com.example.messagingappmv.webservices.cavojsky.requestbodies.RegistrationRequest
-import com.example.messagingappmv.webservices.cavojsky.requestbodies.RoomListRequest
-import com.example.messagingappmv.webservices.cavojsky.responsebodies.LoginResponse
-import com.example.messagingappmv.webservices.cavojsky.responsebodies.RefreshResponse
-import com.example.messagingappmv.webservices.cavojsky.responsebodies.RegistrationResponse
-import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomListItem
+import com.example.messagingappmv.webservices.cavojsky.requestbodies.*
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -67,9 +61,41 @@ object CavojskyWebService {
         throw makeException(response.errorBody()?.string()!!)
     }
 
+    // TODO firebase
+
     fun listRooms(context: Context, callback: (List<RoomListItem>) -> Any) {
         WebserviceTask(callback).execute(
             this.create(context).getRooms(RoomListRequest( TokenStorage.load(context).uid ))
+        )
+    }
+
+    fun sendMessageToRoom(room: String, message: String, context: Context) {
+        WebserviceTask<Void> {}.execute(
+            this.create(context).sendMessageToRoom(RoomMessageRequest(TokenStorage.load(context).uid, room, message))
+        )
+    }
+
+    fun getRoomMessages(room: String, context: Context, callback: (List<RoomReadItem>) -> Any) {
+        WebserviceTask(callback).execute(
+            this.create(context).getRoomMessages(RoomReadRequest(TokenStorage.load(context).uid, room))
+        )
+    }
+
+    fun listContacts(context: Context, callback: (List<ContactListItem>) -> Any) {
+        WebserviceTask(callback).execute(
+            this.create(context).getContacts(ContactListRequest( TokenStorage.load(context).uid ))
+        )
+    }
+
+    fun sendMessageToContact(contact: String, message: String, context: Context) {
+        WebserviceTask<Void> {}.execute(
+            this.create(context).sendMessageToContact(ContactMessageRequest(TokenStorage.load(context).uid, contact, message))
+        )
+    }
+
+    fun getContactMessages(contact: String, context: Context, callback: (List<ContactReadItem>) -> Any) {
+        WebserviceTask(callback).execute(
+            this.create(context).getContactMessages(ContactReadRequest(TokenStorage.load(context).uid, contact))
         )
     }
 }
