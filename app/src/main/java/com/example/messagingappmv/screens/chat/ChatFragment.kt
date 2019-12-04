@@ -60,7 +60,7 @@ class ChatFragment : Fragment() {
         // give the binding object a reference to it.
         binding.chatViewModel = userMessagesViewModel
 
-        val adapter = ChatAdapter(ChatListener { id ->
+        val adapter = ChatAdapter(uid, arguments.userContactKey ,ChatListener { id ->
             Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
             userMessagesViewModel.onUserContactClicked(id)
         })

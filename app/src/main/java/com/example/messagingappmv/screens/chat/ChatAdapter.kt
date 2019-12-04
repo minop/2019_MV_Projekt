@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.database.UserMessages
+import com.example.messagingappmv.databinding.ImageViewItemBinding
 import com.example.messagingappmv.databinding.ListItemChatContactBinding
 
 import com.example.messagingappmv.databinding.ListItemChatUserBinding
@@ -15,10 +16,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ChatAdapter(val clickListener: ChatListener) :
+class ChatAdapter(
+    private val uid: Long,
+    private val contactUid: Long,
+    val clickListener: ChatListener
+) :
     ListAdapter<DataItem, RecyclerView.ViewHolder>(ChatDiffCallback()) {
     private val ITEM_VIEW_TYPE_HEADER = 0
     private val ITEM_VIEW_TYPE_ITEM = 1
+    private val ITEM_VIEW_TYPE_IMAGE = 2
+
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
 
@@ -31,6 +38,10 @@ class ChatAdapter(val clickListener: ChatListener) :
             is ViewHolder2 -> {
                 val nightItem = getItem(position) as DataItem.UserMessage
                 holder.bind(nightItem.userMessage, clickListener)
+            }
+            is ViewHolder3 -> {
+                val nightItem = getItem(position) as DataItem.UserMessage
+                holder.bind(nightItem.userMessage)
             }
         }
 //        holder.bind(getItem(position)!!, clickListener)
@@ -48,13 +59,14 @@ class ChatAdapter(val clickListener: ChatListener) :
         return when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> ViewHolder2.from(parent)
             ITEM_VIEW_TYPE_ITEM -> ViewHolder.from(parent)
+            ITEM_VIEW_TYPE_IMAGE -> ViewHolder3.from(parent)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
     }
 
     fun addHeaderAndSubmitList(list: List<UserMessages>?) {
         adapterScope.launch {
-//            val items = when (list) {
+            //            val items = when (list) {
 //                null -> listOf(DataItem.ContactMessage)
 //                else -> listOf(DataItem.ContactMessage) + list.map { DataItem.UserMessage(it) }
 //            }
@@ -73,7 +85,9 @@ class ChatAdapter(val clickListener: ChatListener) :
 //            is DataItem.ContactMessage -> ITEM_VIEW_TYPE_HEADER
 //            is DataItem.UserMessage -> ITEM_VIEW_TYPE_ITEM
 //        }
-        if(getItem(position).uid == 8L){
+        if (getItem(position).message.substring(0,4) == "gif:"){
+            return ITEM_VIEW_TYPE_IMAGE
+        } else if (getItem(position).uid == uid) {
             return ITEM_VIEW_TYPE_ITEM
         } else {
             return ITEM_VIEW_TYPE_HEADER
@@ -118,6 +132,24 @@ class ChatAdapter(val clickListener: ChatListener) :
         }
     }
 
+    class ViewHolder3 private constructor(val binding: ImageViewItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: UserMessages) {
+            binding.chat = item
+            binding.executePendingBindings()
+
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder3 {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ImageViewItemBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder3(binding)
+            }
+        }
+    }
+
 //    class TextViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 //        companion object {
 //            fun from(parent: ViewGroup): TextViewHolder {
@@ -150,15 +182,21 @@ class ChatListener(val clickListener: (userId: Long) -> Unit) {
 sealed class DataItem {
     abstract val id: Long
     abstract val uid: Long
+    abstract val message: String
+
 
     data class UserMessage(val userMessage: UserMessages) : DataItem() {
         override val id = userMessage.id
         override val uid = userMessage.uid
+        override val message = userMessage.message
+
     }
 
-    data class ContactMessage(val userMessage: UserMessages): DataItem() {
+    data class ContactMessage(val userMessage: UserMessages) : DataItem() {
         override val id = userMessage.id
         override val uid = userMessage.uid
+        override val message = userMessage.message
+
     }
 }
 

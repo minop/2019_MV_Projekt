@@ -146,9 +146,9 @@ class ChatViewModel(
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
-            newMessage.uid = uid
+            newMessage.uid = userContactKey
             newMessage.message = message
-            newMessage.contact_id = userContactKey
+            newMessage.contact_id = uid
 
             Log.d("Message", message)
             insert(newMessage)
