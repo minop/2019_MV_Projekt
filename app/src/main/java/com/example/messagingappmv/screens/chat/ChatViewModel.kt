@@ -31,7 +31,7 @@ import kotlinx.coroutines.*
  * @param sleepNightKey The key of the current night we are working on.
  */
 class ChatViewModel(
-    private val userContactKey: Long = 0L,
+    private val userContactKey: Long = 0L, private val uid: Long,
     dataSource: UserMessagesDatabaseDao
 ) : ViewModel() {
 
@@ -45,19 +45,17 @@ class ChatViewModel(
     private val viewModelJob = Job()
 
 //    private val newUserContact: LiveData<UserMessages>
-//
 //    fun getNewUserContact() = newUserContact
-//
-//
-//    init {
-//        newUserContact=database.getUserMessagesById(userContactKey)
-//    }
+
+    init {
+        Log.d("User Contact Key", userContactKey.toString() + " " + uid.toString())
+    }
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private var newUserMessages = MutableLiveData<UserMessages?>()
 
-    val allUserMessages = database.getAllUserMessages()
+    val allUserMessages = database.getAllUserMessages(uid,userContactKey)
 
     /**
      * Request a toast by setting this value to true.
@@ -145,27 +143,12 @@ class ChatViewModel(
         }
     }
 
-    /**
-     * Executes when the START button is clicked.
-     */
-    fun onStart() {
-        uiScope.launch {
-            // Create a new night, which captures the current time,
-            // and insert it into the database.
-            val newMessage = UserMessages()
-            newMessage.uid = 8
-
-            insert(newMessage)
-
-            newUserMessages.value = getUserMessageFromDatabase()
-        }
-    }
-
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
-            newMessage.uid = 8
+            newMessage.uid = uid
             newMessage.message = message
+            newMessage.contact_id = userContactKey
 
             Log.d("Message", message)
             insert(newMessage)

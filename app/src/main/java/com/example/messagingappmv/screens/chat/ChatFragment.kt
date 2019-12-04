@@ -37,7 +37,7 @@ class ChatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        val uid = 326L
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentChatBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_chat, container, false)
@@ -49,7 +49,7 @@ class ChatFragment : Fragment() {
 
         // Create an instance of the ViewModel Factory.
         val dataSource = UserContactDatabase.getInstance(application).userMessagesDatabaseDao
-        val viewModelFactory = ChatViewModelFactory(arguments.userContactKey, dataSource)
+        val viewModelFactory = ChatViewModelFactory(arguments.userContactKey, uid, dataSource)
 
         // Get a reference to the ViewModel associated with this fragment.
         userMessagesViewModel =

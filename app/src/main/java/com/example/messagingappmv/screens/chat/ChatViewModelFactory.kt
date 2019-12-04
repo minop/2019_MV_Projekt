@@ -26,12 +26,12 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
  * Provides the key for the night and the SleepDatabaseDao to the ViewModel.
  */
 class ChatViewModelFactory(
-    private val userContactKey: Long,
+    private val userContactKey: Long, private val uidKey: Long,
     private val dataSource: UserMessagesDatabaseDao) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-            return ChatViewModel(userContactKey, dataSource) as T
+            return ChatViewModel(userContactKey, uidKey, dataSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
