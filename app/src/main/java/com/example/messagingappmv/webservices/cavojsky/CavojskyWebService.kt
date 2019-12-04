@@ -9,7 +9,9 @@ import com.example.messagingappmv.webservices.cavojsky.requestbodies.LoginReques
 import com.example.messagingappmv.webservices.cavojsky.requestbodies.RefreshRequest
 import com.example.messagingappmv.webservices.cavojsky.requestbodies.RegistrationRequest
 import com.example.messagingappmv.webservices.cavojsky.requestbodies.RoomListRequest
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.LoginResponse
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RefreshResponse
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.RegistrationResponse
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomListItem
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -41,27 +43,19 @@ object CavojskyWebService {
 
     // webservice operations
     fun register(username: String, password: String, context: Context) {
-        val response = this.create(context).register(RegistrationRequest(username, password)).execute()
-
-        if(response.isSuccessful) {
-            val body = response.body()!!
-            TokenStorage.save(LoginData(body.uid, body.access, body.refresh), context)
-            return
-        }
-
-        throw makeException(response.errorBody()?.string()!!)
+        WebserviceTask<RegistrationResponse> { response ->
+            TokenStorage.save(LoginData(response.uid, response.access, response.refresh), context)
+        }.execute(
+            this.create(context).register(RegistrationRequest(username, password))
+        )
     }
 
     fun login(username: String, password: String, context: Context) {
-        val response = this.create(context).login(LoginRequest(username, password)).execute()
-
-        if(response.isSuccessful) {
-            val body = response.body()!!
-            TokenStorage.save(LoginData(body.uid, body.access, body.refresh), context)
-            return
-        }
-
-        throw makeException(response.errorBody()?.string()!!)
+        WebserviceTask<LoginResponse> { response ->
+            TokenStorage.save(LoginData(response.uid, response.access, response.refresh), context)
+        }.execute(
+            this.create(context).login(LoginRequest(username, password))
+        )
     }
 
     fun refreshTokens(uid: String, refreshToken: String, context: Context) : RefreshResponse {
@@ -73,12 +67,9 @@ object CavojskyWebService {
         throw makeException(response.errorBody()?.string()!!)
     }
 
-    fun listRooms(context: Context) : List<RoomListItem> {
-        val response = this.create(context).getRooms(RoomListRequest( TokenStorage.load(context).uid )).execute()
-
-        if(response.isSuccessful)
-            return response.body()!!
-
-        throw makeException(response.errorBody()?.string()!!)
+    fun listRooms(context: Context, callback: (List<RoomListItem>) -> Any) {
+        WebserviceTask(callback).execute(
+            this.create(context).getRooms(RoomListRequest( TokenStorage.load(context).uid ))
+        )
     }
 }
