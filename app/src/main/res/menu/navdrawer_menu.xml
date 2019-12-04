@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/contactListFragment"
+        android:icon="@android:drawable/ic_delete"
+        android:title="ContactListFragment" />
+    <item
+        android:id="@+id/roomFragment"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="RoomFragment" />
+</menu>

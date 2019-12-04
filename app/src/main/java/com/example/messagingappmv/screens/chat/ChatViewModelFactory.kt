@@ -18,6 +18,7 @@ package com.example.messagingappmv.screens.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.messagingappmv.database.UserContactDatabaseDao
+import com.example.messagingappmv.database.UserMessagesDatabaseDao
 
 /**
  * This is pretty much boiler plate code for a ViewModel Factory.
@@ -26,7 +27,7 @@ import com.example.messagingappmv.database.UserContactDatabaseDao
  */
 class ChatViewModelFactory(
     private val userContactKey: Long,
-    private val dataSource: UserContactDatabaseDao) : ViewModelProvider.Factory {
+    private val dataSource: UserMessagesDatabaseDao) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {

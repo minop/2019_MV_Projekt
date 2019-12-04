@@ -110,6 +110,7 @@ class ContactListFragment : Fragment() {
             userContactViewModel.onSend(editTextMessage.text.toString())
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
+            user_contact_list.smoothScrollToPosition(0)
 
         }
     }
