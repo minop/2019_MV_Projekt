@@ -9,7 +9,7 @@ import okhttp3.Route
 
 class TokenAuthenticator(val context: Context) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        if(response.code == 401 && response.request.header("OpinAuth")?.compareTo("accept")==0) {
+        if(response.code == 401 && response.request.header("ZadanieApiAuth")?.compareTo("accept")==0) {
             val loginData = TokenStorage.load(context)
 
             if(!response.request.header("Authorization").equals("Bearer ${loginData.accessToken}"))
