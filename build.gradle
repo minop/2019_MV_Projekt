@@ -9,6 +9,7 @@ buildscript {
         gradleVersion = '3.4.0'
         navigationVersion = '1.0.0-alpha07'
         dataBindingCompilerVersion = gradleVersion // Always need to be the same.
+        supportlibVersion = '1.0.0'
     }
 
     repositories {
