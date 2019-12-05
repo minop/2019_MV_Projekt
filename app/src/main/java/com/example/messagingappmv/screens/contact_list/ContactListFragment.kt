@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_contact_list.*
 
 import com.example.messagingappmv.databinding.FragmentContactListBinding
+import com.giphy.sdk.ui.views.GiphyDialogFragment
 
 class ContactListFragment : Fragment() {
     private lateinit var userContactViewModel: ContactListViewModel
@@ -111,7 +112,6 @@ class ContactListFragment : Fragment() {
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
             user_contact_list.smoothScrollToPosition(0)
-
         }
     }
 }

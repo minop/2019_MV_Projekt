@@ -21,7 +21,7 @@ class ContactListViewModel(
     dataSource: UserContactDatabaseDao,
     application: Application) : ViewModel() {
 
-
+    private val context = application.applicationContext
     /**
      * Hold a reference to SleepDatabase via SleepDatabaseDao.
      */

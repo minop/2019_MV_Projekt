@@ -23,6 +23,12 @@ import com.example.messagingappmv.databinding.FragmentChatBinding
 import com.example.messagingappmv.screens.contact_list.ContactListAdapter
 import com.example.messagingappmv.screens.contact_list.ContactListListener
 import com.example.messagingappmv.screens.contact_list.ContactListViewModel
+import com.giphy.sdk.core.models.Media
+import com.giphy.sdk.ui.GPHSettings
+import com.giphy.sdk.ui.GiphyCoreUI
+import com.giphy.sdk.ui.themes.GridType
+import com.giphy.sdk.ui.themes.LightTheme
+import com.giphy.sdk.ui.views.GiphyDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_contact_list.*
@@ -102,16 +108,47 @@ class ChatFragment : Fragment() {
         return binding.root
     }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
         super.onActivityCreated(savedInstanceState)
+        context?.let { GiphyCoreUI.configure(context = it, apiKey = "TMyIPe2V232AT5Y3LF2GtyFf1qrpBzSf", verificationMode = false) }
+
         send_button.setOnClickListener{
             Log.d("Message", "In Listener")
-            userMessagesViewModel.onSend(editTextMessageChat.text.toString())
+            val newMessage = editTextMessageChat.text.toString()
+            if (newMessage != ""){
+                userMessagesViewModel.onSend(newMessage)
+            } else {
+                Snackbar.make(
+                    activity!!.findViewById(android.R.id.content),
+                    getString(R.string.empty_message),
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
 
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
 
 
         }
+
+        send_gif_button.setOnClickListener{
+            val settings = GPHSettings(gridType = GridType.waterfall, theme = LightTheme, dimBackground = true)
+            val gifsDialog = GiphyDialogFragment.newInstance(settings)
+            fragmentManager?.let { gifsDialog.show(it, "gifs_dialog") }
+            gifsDialog.gifSelectionListener = object: GiphyDialogFragment.GifSelectionListener {
+                override fun onGifSelected(media: Media) {
+                    Log.d("ID Gif", media.id)
+                    val newMessage = "gif:" + media.id
+                    userMessagesViewModel.onSend(newMessage)
+                }
+
+                override fun onDismissed() {
+                    //Your user dismissed the dialog without selecting a GIF
+                }
+            }
+
+        }
+
         editTextMessageChat.addTextChangedListener(
             object : TextWatcher {
 

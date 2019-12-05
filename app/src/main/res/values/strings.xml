@@ -5,6 +5,7 @@
     <string name="start">Start</string>
     <string name="textMessage">Default Name</string>
     <string name="cleared_message">All your data is gone forever.</string>
+    <string name="empty_message">Type message</string>
     <string name="close">Close</string>
     <string name="back">Back</string>
     <string name="send">Send</string>

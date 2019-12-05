@@ -85,13 +85,17 @@ class ChatAdapter(
 //            is DataItem.ContactMessage -> ITEM_VIEW_TYPE_HEADER
 //            is DataItem.UserMessage -> ITEM_VIEW_TYPE_ITEM
 //        }
-        if (getItem(position).message.substring(0,4) == "gif:"){
-            return ITEM_VIEW_TYPE_IMAGE
-        } else if (getItem(position).uid == uid) {
-            return ITEM_VIEW_TYPE_ITEM
-        } else {
-            return ITEM_VIEW_TYPE_HEADER
+        if(getItem(position).message != ""){
+            if (getItem(position).message.substring(0,4) == "gif:"){
+                return ITEM_VIEW_TYPE_IMAGE
+            } else if (getItem(position).uid == uid) {
+                return ITEM_VIEW_TYPE_ITEM
+            } else {
+                return ITEM_VIEW_TYPE_HEADER
+            }
         }
+        else return -1
+
     }
 
     class ViewHolder private constructor(val binding: ListItemChatUserBinding) :
