@@ -16,6 +16,8 @@ package com.example.messagingappmv.screens.chat
  * limitations under the License.
  */
 
+import android.app.Application
+import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,6 +25,10 @@ import androidx.lifecycle.ViewModel
 import com.example.messagingappmv.database.UserContact
 import com.example.messagingappmv.database.UserMessages
 import com.example.messagingappmv.database.UserMessagesDatabaseDao
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactListItem
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
 import kotlinx.coroutines.*
 
 /**
@@ -31,10 +37,14 @@ import kotlinx.coroutines.*
  * @param sleepNightKey The key of the current night we are working on.
  */
 class ChatViewModel(
-    private val userContactKey: Long = 0L, private val uid: Long,
-    dataSource: UserMessagesDatabaseDao
-) : ViewModel() {
+    private val userContactKey: Long,
+    dataSource: UserMessagesDatabaseDao,
+    application: Application
 
+) : ViewModel() {
+    private val context = application.applicationContext
+
+    private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
 
     /** Coroutine setup variables */
@@ -48,14 +58,14 @@ class ChatViewModel(
 //    fun getNewUserContact() = newUserContact
 
     init {
-        Log.d("User Contact Key", userContactKey.toString() + " " + uid.toString())
+        Log.d("User Contact Key", userContactKey.toString() )
     }
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private var newUserMessages = MutableLiveData<UserMessages?>()
 
-    val allUserMessages = database.getAllUserMessages(uid,userContactKey)
+    val allUserMessages = database.getAllUserMessages(uid, userContactKey)
 
     /**
      * Request a toast by setting this value to true.
@@ -103,7 +113,37 @@ class ChatViewModel(
 
     private fun initializeUserContact() {
         uiScope.launch {
-            newUserMessages.value = getUserMessageFromDatabase()
+            newUserMessages.value = getUserMessagesFromDatabase()
+        }
+    }
+
+    private suspend fun getUserMessagesFromDatabase(): UserMessages? {
+        val userMessages = mutableListOf<UserMessages>()
+
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+        Log.d("Contact Uid", userContactKey.toString())
+
+        CavojskyWebService.getContactMessages(userContactKey.toString(), context) { messages ->
+            Log.d("ContactListItem", messages.toString())
+            for (item: ContactReadItem in messages) {
+                var tmpUserContact = UserMessages()
+                tmpUserContact = UserMessages(item.uid.toLong(), item.contact.toLong(), item.message, item.time, item.uid_name, item.contact_name  )
+                userMessages.add(tmpUserContact)
+            }
+            // request na ziskanie poctu zaznamov a potom insertnem indexy ktore su viac ako nieco
+//            AsyncTask.execute { database.getAllUserMessages(uid, contactUid) }
+            AsyncTask.execute { database.insertAll(userMessages) }
+
+
+            Log.d("Messages", userMessages.toString())
+        }
+        return withContext(Dispatchers.IO) {
+
+            var userContact = database.getUserMessage()
+            if (userContact?.uid_name == userContact?.uid_name) {
+                userContact = null
+            }
+            userContact
         }
     }
 
@@ -146,14 +186,13 @@ class ChatViewModel(
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
-            newMessage.uid = userContactKey
+            newMessage.uid = uid
             newMessage.message = message
-            newMessage.contact_id = uid
+            newMessage.contact_id = userContactKey
 
             Log.d("Message", message)
             insert(newMessage)
             newUserMessages.value = getUserMessageFromDatabase()
-
 
 
         }

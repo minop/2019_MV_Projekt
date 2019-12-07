@@ -34,6 +34,8 @@ interface UserMessagesDatabaseDao {
     @Insert
     fun insert(contact: UserMessages)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll( contacts: List<UserMessages>)
     /**
      * When updating a row with a value already set in a column,
      * replaces the old value with the new one.

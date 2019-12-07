@@ -23,6 +23,7 @@ import com.example.messagingappmv.databinding.FragmentChatBinding
 import com.example.messagingappmv.screens.contact_list.ContactListAdapter
 import com.example.messagingappmv.screens.contact_list.ContactListListener
 import com.example.messagingappmv.screens.contact_list.ContactListViewModel
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.ui.GPHSettings
 import com.giphy.sdk.ui.GiphyCoreUI
@@ -43,7 +44,8 @@ class ChatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val uid = 326L
+        val uid = context?.let { TokenStorage.load(it).uid }!!.toLong()
+
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentChatBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_chat, container, false)
@@ -52,10 +54,11 @@ class ChatFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.title = getString(R.string.chat_title)
 
         val arguments = ChatFragmentArgs.fromBundle(arguments)
+        Log.d("ContactUid", arguments.toString())
 
         // Create an instance of the ViewModel Factory.
         val dataSource = UserContactDatabase.getInstance(application).userMessagesDatabaseDao
-        val viewModelFactory = ChatViewModelFactory(arguments.userContactKey, uid, dataSource)
+        val viewModelFactory = ChatViewModelFactory( arguments.userContactKey, dataSource, application)
 
         // Get a reference to the ViewModel associated with this fragment.
         userMessagesViewModel =

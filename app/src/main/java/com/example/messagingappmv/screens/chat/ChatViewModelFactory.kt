@@ -15,6 +15,7 @@ package com.example.messagingappmv.screens.chat
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.messagingappmv.database.UserContactDatabaseDao
@@ -26,12 +27,14 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
  * Provides the key for the night and the SleepDatabaseDao to the ViewModel.
  */
 class ChatViewModelFactory(
-    private val userContactKey: Long, private val uidKey: Long,
-    private val dataSource: UserMessagesDatabaseDao) : ViewModelProvider.Factory {
+    private val userContactKey: Long,
+    private val dataSource: UserMessagesDatabaseDao,
+    private val application: Application
+) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-            return ChatViewModel(userContactKey, uidKey, dataSource) as T
+            return ChatViewModel(userContactKey, dataSource, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

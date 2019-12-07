@@ -12,6 +12,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import android.os.AsyncTask
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactListItem
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 
 
 /**
@@ -19,7 +25,8 @@ import android.util.Log
  */
 class ContactListViewModel(
     dataSource: UserContactDatabaseDao,
-    application: Application) : ViewModel() {
+    application: Application
+) : ViewModel() {
 
     private val context = application.applicationContext
     /**
@@ -108,6 +115,24 @@ class ContactListViewModel(
      *  recording.
      */
     private suspend fun getUserContactFromDatabase(): UserContact? {
+        val userList = mutableListOf<UserContact>()
+
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+
+        CavojskyWebService.listContacts(context) { contacts ->
+            Log.d("ContactListItem", contacts.toString())
+            for (item: ContactListItem in contacts) {
+                var tmpUserContact = UserContact()
+                tmpUserContact = UserContact(item.id.toLong(), item.name)
+                userList.add(tmpUserContact)
+            }
+            AsyncTask.execute { database.insertAll(userList) }
+
+            Log.d("ContactListItem", userList.toString())
+        }
+
+
+
         return withContext(Dispatchers.IO) {
 
             var userContact = database.getUserContact()
@@ -157,7 +182,8 @@ class ContactListViewModel(
             val newNight = UserContact()
             newNight.user_name = message
             Log.d("Message", message)
-            insert(newNight)
+//            CavojskyWebService.sendMessageToContact()
+//            insert(newNight)
             newUserContact.value = getUserContactFromDatabase()
 
 
