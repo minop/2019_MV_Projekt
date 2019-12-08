@@ -70,7 +70,7 @@ object CavojskyWebService {
     }
 
     fun sendMessageToRoom(room: String, message: String, context: Context) {
-        WebserviceTask<Void> {}.execute(
+        WebserviceTask<Unit> {}.execute(
             this.create(context).sendMessageToRoom(RoomMessageRequest(TokenStorage.load(context).uid, room, message))
         )
     }
@@ -88,7 +88,7 @@ object CavojskyWebService {
     }
 
     fun sendMessageToContact(contact: String, message: String, context: Context) {
-        WebserviceTask<Void> {}.execute(
+        WebserviceTask<Unit> {}.execute(
             this.create(context).sendMessageToContact(ContactMessageRequest(TokenStorage.load(context).uid, contact, message))
         )
     }

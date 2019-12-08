@@ -21,7 +21,7 @@ interface CavojskyWebServiceInterface {
 
     @POST("/user/fid.php")
     @Headers("ZadanieApiAuth: accept")
-    fun setFirebaseId(@Body body: UserFirebaseRequest) : Call<Void>
+    fun setFirebaseId(@Body body: UserFirebaseRequest) : Call<Unit>
 
     // room endpoints
     @POST("/room/list.php")
@@ -30,7 +30,7 @@ interface CavojskyWebServiceInterface {
 
     @POST("/room/message.php")
     @Headers("ZadanieApiAuth: accept")
-    fun sendMessageToRoom(@Body body: RoomMessageRequest) : Call<Void>
+    fun sendMessageToRoom(@Body body: RoomMessageRequest) : Call<Unit>
 
     @POST("/room/read.php")
     @Headers("ZadanieApiAuth: accept")
@@ -43,7 +43,7 @@ interface CavojskyWebServiceInterface {
 
     @POST("/contact/message.php")
     @Headers("ZadanieApiAuth: accept")
-    fun sendMessageToContact(@Body body: ContactMessageRequest) : Call<Void>
+    fun sendMessageToContact(@Body body: ContactMessageRequest) : Call<Unit>
 
     @POST("/contact/read.php")
     @Headers("ZadanieApiAuth: accept")
