@@ -36,17 +36,19 @@ object CavojskyWebService {
     }
 
     // webservice operations
-    fun register(username: String, password: String, context: Context) {
+    fun register(username: String, password: String, context: Context, callback: () -> Unit = {}) {
         WebserviceTask<RegistrationResponse> { response ->
             TokenStorage.save(LoginData(response!!.uid, response.access, response.refresh), context)
+            callback.invoke()
         }.execute(
             this.create(context).register(RegistrationRequest(username, password))
         )
     }
 
-    fun login(username: String, password: String, context: Context) {
+    fun login(username: String, password: String, context: Context, callback: () -> Unit = {}) {
         WebserviceTask<LoginResponse> { response ->
             TokenStorage.save(LoginData(response!!.uid, response.access, response.refresh), context)
+            callback.invoke()
         }.execute(
             this.create(context).login(LoginRequest(username, password))
         )
@@ -63,7 +65,7 @@ object CavojskyWebService {
 
     // TODO firebase
 
-    fun listRooms(context: Context, callback: (List<RoomListItem>) -> Any) {
+    fun listRooms(context: Context, callback: (List<RoomListItem>) -> Unit) {
         WebserviceTask<List<RoomListItem>>{ response ->
             callback.invoke(response!!)
         }.execute(
@@ -71,13 +73,15 @@ object CavojskyWebService {
         )
     }
 
-    fun sendMessageToRoom(room: String, message: String, context: Context) {
-        WebserviceTask<Unit> {}.execute(
+    fun sendMessageToRoom(room: String, message: String, context: Context, callback: () -> Unit = {}) {
+        WebserviceTask<Unit> {
+            callback.invoke()
+        }.execute(
             this.create(context).sendMessageToRoom(RoomMessageRequest(TokenStorage.load(context).uid, room, message))
         )
     }
 
-    fun getRoomMessages(room: String, context: Context, callback: (List<RoomReadItem>) -> Any) {
+    fun getRoomMessages(room: String, context: Context, callback: (List<RoomReadItem>) -> Unit) {
         WebserviceTask<List<RoomReadItem>>{ response ->
             callback.invoke(response!!)
         }.execute(
@@ -85,7 +89,7 @@ object CavojskyWebService {
         )
     }
 
-    fun listContacts(context: Context, callback: (List<ContactListItem>) -> Any) {
+    fun listContacts(context: Context, callback: (List<ContactListItem>) -> Unit) {
         WebserviceTask<List<ContactListItem>>{ response ->
             callback.invoke(response!!)
         }.execute(
@@ -93,13 +97,15 @@ object CavojskyWebService {
         )
     }
 
-    fun sendMessageToContact(contact: String, message: String, context: Context) {
-        WebserviceTask<Unit> {}.execute(
+    fun sendMessageToContact(contact: String, message: String, context: Context, callback: () -> Unit = {}) {
+        WebserviceTask<Unit>{
+            callback.invoke()
+        }.execute(
             this.create(context).sendMessageToContact(ContactMessageRequest(TokenStorage.load(context).uid, contact, message))
         )
     }
 
-    fun getContactMessages(contact: String, context: Context, callback: (List<ContactReadItem>) -> Any) {
+    fun getContactMessages(contact: String, context: Context, callback: (List<ContactReadItem>) -> Unit) {
         WebserviceTask<List<ContactReadItem>>{ response ->
             callback.invoke(response!!)
         }.execute(
