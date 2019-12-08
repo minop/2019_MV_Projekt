@@ -19,6 +19,7 @@ package com.example.messagingappmv.screens.chat
 import android.app.Application
 import android.os.AsyncTask
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,6 +31,8 @@ import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactListItem
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
 import kotlinx.coroutines.*
+import java.lang.Exception
+import java.lang.IllegalStateException
 
 /**
  * ViewModel for SleepQualityFragment.
@@ -58,7 +61,7 @@ class ChatViewModel(
 //    fun getNewUserContact() = newUserContact
 
     init {
-        Log.d("User Contact Key", userContactKey.toString() )
+        Log.d("User Contact Key", userContactKey.toString())
     }
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -122,17 +125,34 @@ class ChatViewModel(
 
         Log.d("Uid Login user", TokenStorage.load(context).uid)
         Log.d("Contact Uid", userContactKey.toString())
+        var numMessages = -1
 
         CavojskyWebService.getContactMessages(userContactKey.toString(), context) { messages ->
             Log.d("ContactListItem", messages.toString())
             for (item: ContactReadItem in messages) {
                 var tmpUserContact = UserMessages()
-                tmpUserContact = UserMessages(item.uid.toLong(), item.contact.toLong(), item.message, item.time, item.uid_name, item.contact_name  )
+                tmpUserContact = UserMessages(
+                    item.uid.toLong(),
+                    item.contact.toLong(),
+                    item.message,
+                    item.time,
+                    item.uid_name,
+                    item.contact_name
+                )
                 userMessages.add(tmpUserContact)
+                numMessages = allUserMessages.value?.size ?: -1
+                Log.d("All messages length", numMessages.toString())
+
             }
-            // request na ziskanie poctu zaznamov a potom insertnem indexy ktore su viac ako nieco
-//            AsyncTask.execute { database.getAllUserMessages(uid, contactUid) }
-            AsyncTask.execute { database.insertAll(userMessages) }
+
+            if (numMessages < userMessages.size && numMessages != -1) {
+                AsyncTask.execute { database.insertAll(userMessages.subList(numMessages,userMessages.size)) }
+                Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
+
+            } else {
+                Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
+
+            }
 
 
             Log.d("Messages", userMessages.toString())
@@ -189,9 +209,22 @@ class ChatViewModel(
             newMessage.uid = uid
             newMessage.message = message
             newMessage.contact_id = userContactKey
-
             Log.d("Message", message)
-            insert(newMessage)
+
+            CavojskyWebService.sendMessageToContact(
+                userContactKey.toString(),
+                message,
+                context
+            ) {
+                AsyncTask.execute {
+
+                    database.insert(newMessage)
+
+                    Toast.makeText(context, "Message send" , Toast.LENGTH_LONG).show()
+
+                }
+            }
+
             newUserMessages.value = getUserMessageFromDatabase()
 
 

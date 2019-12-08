@@ -85,16 +85,20 @@ class ChatAdapter(
 //            is DataItem.ContactMessage -> ITEM_VIEW_TYPE_HEADER
 //            is DataItem.UserMessage -> ITEM_VIEW_TYPE_ITEM
 //        }
-        if(getItem(position).message != ""){
-            if (getItem(position).message.substring(0,4) == "gif:"){
-                return ITEM_VIEW_TYPE_IMAGE
-            } else if (getItem(position).uid == uid) {
+        val message = getItem(position).message
+        if (message != "") {
+            if (message.length >= 5) {
+                if (message.substring(0, 4) == "gif:") {
+                    return ITEM_VIEW_TYPE_IMAGE
+                }
+            }
+            if (getItem(position).uid == uid) {
                 return ITEM_VIEW_TYPE_ITEM
             } else {
                 return ITEM_VIEW_TYPE_HEADER
             }
-        }
-        else return -1
+
+        } else return -1
 
     }
 
