@@ -3,14 +3,15 @@ package com.example.messagingappmv.screens.chat
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.database.UserMessages
-import com.example.messagingappmv.databinding.ImageViewItemBinding
-import com.example.messagingappmv.databinding.ListItemChatContactBinding
+import com.example.messagingappmv.databinding.*
 
-import com.example.messagingappmv.databinding.ListItemChatUserBinding
+import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +25,15 @@ class ChatAdapter(
     ListAdapter<DataItem, RecyclerView.ViewHolder>(ChatDiffCallback()) {
     private val ITEM_VIEW_TYPE_HEADER = 0
     private val ITEM_VIEW_TYPE_ITEM = 1
-    private val ITEM_VIEW_TYPE_IMAGE = 2
+    private val ITEM_VIEW_TYPE_IMAGE_CONTACT = 2
+    private val ITEM_VIEW_TYPE_IMAGE_USER = 3
+
+
+
+    private var _notification = MutableLiveData<Boolean?>()
+
+    val notification: LiveData<Boolean?>
+        get() = _notification
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -43,6 +52,10 @@ class ChatAdapter(
                 val nightItem = getItem(position) as DataItem.UserMessage
                 holder.bind(nightItem.userMessage)
             }
+            is ViewHolder4 -> {
+                val nightItem = getItem(position) as DataItem.UserMessage
+                holder.bind(nightItem.userMessage)
+            }
         }
 //        holder.bind(getItem(position)!!, clickListener)
 //        val current_message = getItem(position!!)
@@ -56,10 +69,12 @@ class ChatAdapter(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
         return when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> ViewHolder2.from(parent)
             ITEM_VIEW_TYPE_ITEM -> ViewHolder.from(parent)
-            ITEM_VIEW_TYPE_IMAGE -> ViewHolder3.from(parent)
+            ITEM_VIEW_TYPE_IMAGE_CONTACT -> ViewHolder4.from(parent)
+            ITEM_VIEW_TYPE_IMAGE_USER -> ViewHolder3.from(parent)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
     }
@@ -75,6 +90,10 @@ class ChatAdapter(
 
             withContext(Dispatchers.Main) {
                 submitList(items)
+
+//                _notification.value = true
+
+
             }
         }
     }
@@ -89,7 +108,11 @@ class ChatAdapter(
         if (message != "") {
             if (message.length >= 5) {
                 if (message.substring(0, 4) == "gif:") {
-                    return ITEM_VIEW_TYPE_IMAGE
+                    if (getItem(position).uid == uid) {
+                        return ITEM_VIEW_TYPE_IMAGE_USER
+                    } else {
+                        return ITEM_VIEW_TYPE_IMAGE_CONTACT
+                    }
                 }
             }
             if (getItem(position).uid == uid) {
@@ -140,7 +163,7 @@ class ChatAdapter(
         }
     }
 
-    class ViewHolder3 private constructor(val binding: ImageViewItemBinding) :
+    class ViewHolder3 private constructor(val binding: ImageItemContactBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: UserMessages) {
@@ -152,8 +175,26 @@ class ChatAdapter(
         companion object {
             fun from(parent: ViewGroup): ViewHolder3 {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ImageViewItemBinding.inflate(layoutInflater, parent, false)
+                val binding = ImageItemContactBinding.inflate(layoutInflater, parent, false)
                 return ViewHolder3(binding)
+            }
+        }
+    }
+
+    class ViewHolder4 private constructor(val binding: ImageItemUserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: UserMessages) {
+            binding.chat = item
+            binding.executePendingBindings()
+
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder4 {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ImageItemUserBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder4(binding)
             }
         }
     }

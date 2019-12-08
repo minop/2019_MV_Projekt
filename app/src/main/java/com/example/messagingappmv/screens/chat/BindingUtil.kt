@@ -31,7 +31,7 @@ fun TextView.setNameString(item: UserMessages?) {
 fun bindImage(imgView: ImageView, gifId: String?) {
     Log.d("Image id", gifId)
 //    val imgUrl = "https://media1.giphy.com/media/" + (gifId?.substring(4) ?: null) + "/100_s.gif?cid=55406586ba2b8638b929a9c0b7ed3dd63afa0990e0e02221&rid=100_s.gif"
-    val imgUrl =  "https://media3.giphy.com/media/" + (gifId?.substring(4) ?: null) + "/200.gif?cid=55406586d919cb8ee36800dd3d476776b7489557b600d9ca&rid=200.gif"
+    val imgUrl =  "https://media3.giphy.com/media/" + (gifId?.substring(4) ?: null) + "/100.gif?cid=55406586d919cb8ee36800dd3d476776b7489557b600d9ca&rid=100.gif"
     Log.d("Image url", imgUrl)
 
     imgUrl?.let {

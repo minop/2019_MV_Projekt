@@ -23,16 +23,13 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.messagingappmv.database.UserContact
 import com.example.messagingappmv.database.UserMessages
 import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
-import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactListItem
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
+import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
-import java.lang.Exception
-import java.lang.IllegalStateException
 
 /**
  * ViewModel for SleepQualityFragment.
@@ -66,7 +63,12 @@ class ChatViewModel(
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    private var newUserMessages = MutableLiveData<UserMessages?>()
+    private var _newUserMessages = MutableLiveData<UserMessages?>()
+
+    private var _newMessageNotification = MutableLiveData<Boolean?>()
+
+    val newMessageNotification: LiveData<Boolean?>
+        get() = _newMessageNotification
 
     val allUserMessages = database.getAllUserMessages(uid, userContactKey)
 
@@ -94,6 +96,10 @@ class ChatViewModel(
         _showSnackbarEvent.value = null
     }
 
+    fun doneNewMessageNotification() {
+        _newMessageNotification.value = null
+    }
+
 
     /**
      * Navigation for the Chat fragment.
@@ -116,7 +122,7 @@ class ChatViewModel(
 
     private fun initializeUserContact() {
         uiScope.launch {
-            newUserMessages.value = getUserMessagesFromDatabase()
+            _newUserMessages.value = getUserMessagesFromDatabase()
         }
     }
 
@@ -146,7 +152,14 @@ class ChatViewModel(
             }
 
             if (numMessages < userMessages.size && numMessages != -1) {
-                AsyncTask.execute { database.insertAll(userMessages.subList(numMessages,userMessages.size)) }
+                AsyncTask.execute {
+                    database.insertAll(
+                        userMessages.subList(
+                            numMessages,
+                            userMessages.size
+                        )
+                    )
+                }
                 Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
 
             } else {
@@ -175,7 +188,7 @@ class ChatViewModel(
      *  recording.
      */
     private suspend fun getUserMessageFromDatabase(): UserMessages? {
-        return withContext(Dispatchers.IO) {
+        val newMessage = withContext(Dispatchers.IO) {
 
             var userMessage = database.getUserMessage()
             if (userMessage?.id == userMessage?.id) {
@@ -183,6 +196,13 @@ class ChatViewModel(
             }
             userMessage
         }
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                _newMessageNotification.value = true
+            }
+        }
+
+        return newMessage
     }
 
     private suspend fun insert(userMessage: UserMessages) {
@@ -215,18 +235,14 @@ class ChatViewModel(
                 userContactKey.toString(),
                 message,
                 context
-            ) {
+            )
+            {
                 AsyncTask.execute {
-
                     database.insert(newMessage)
-
-                    Toast.makeText(context, "Message send" , Toast.LENGTH_LONG).show()
-
                 }
+
             }
-
-            newUserMessages.value = getUserMessageFromDatabase()
-
+            _newUserMessages.value = getUserMessageFromDatabase()
 
         }
     }
@@ -240,7 +256,7 @@ class ChatViewModel(
             clear()
 
             // And clear tonight since it's no longer in the database
-            newUserMessages.value = null
+            _newUserMessages.value = null
 
             // Show a snackbar message, because it's friendly.
             _showSnackbarEvent.value = true
