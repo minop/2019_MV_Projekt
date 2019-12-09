@@ -32,9 +32,9 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
 /**
- * ViewModel for SleepQualityFragment.
+ * ViewModel for ChatFragment.
  *
- * @param sleepNightKey The key of the current night we are working on.
+ * @param userContactKey The key of the current chat we are working on.
  */
 class ChatViewModel(
     private val userContactKey: Long,
@@ -43,7 +43,6 @@ class ChatViewModel(
 
 ) : ViewModel() {
     private val context = application.applicationContext
-
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
 
@@ -53,67 +52,18 @@ class ChatViewModel(
      * viewModelJob allows us to cancel all coroutines started by this ViewModel.
      */
     private val viewModelJob = Job()
-
-//    private val newUserContact: LiveData<UserMessages>
-//    fun getNewUserContact() = newUserContact
-
-    init {
-        Log.d("User Contact Key", userContactKey.toString())
-    }
-
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private var _newUserMessages = MutableLiveData<UserMessages?>()
-
-    private var _newMessageNotification = MutableLiveData<Boolean?>()
-
-    val newMessageNotification: LiveData<Boolean?>
-        get() = _newMessageNotification
-
     val allUserMessages = database.getAllUserMessages(uid, userContactKey)
-
-    /**
-     * Request a toast by setting this value to true.
-     *
-     * This is private because we don't want to expose setting this value to the Fragment.
-     */
-    private var _showSnackbarEvent = MutableLiveData<Boolean?>()
-
-    /**
-     * If this is true, immediately `show()` a toast and call `doneShowingSnackbar()`.
-     */
-    val showSnackBarEvent: LiveData<Boolean?>
-        get() = _showSnackbarEvent
-
-
-    /**
-     * Call this immediately after calling `show()` on a toast.
-     *
-     * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
-     * toast.
-     */
-    fun doneShowingSnackbar() {
-        _showSnackbarEvent.value = null
-    }
-
-    fun doneNewMessageNotification() {
-        _newMessageNotification.value = null
-    }
-
 
     /**
      * Navigation for the Chat fragment.
      */
     private val _navigateToChat = MutableLiveData<Long>()
-    val navigateToChat
-        get() = _navigateToChat
 
     fun onUserContactClicked(id: Long) {
         _navigateToChat.value = id
-    }
-
-    fun onChatNavigated() {
-        _navigateToChat.value = null
     }
 
     init {
@@ -136,8 +86,7 @@ class ChatViewModel(
         CavojskyWebService.getContactMessages(userContactKey.toString(), context) { messages ->
             Log.d("ContactListItem", messages.toString())
             for (item: ContactReadItem in messages) {
-                var tmpUserContact = UserMessages()
-                tmpUserContact = UserMessages(
+                val tmpUserContact = UserMessages(
                     item.uid.toLong(),
                     item.contact.toLong(),
                     item.message,
@@ -148,7 +97,6 @@ class ChatViewModel(
                 userMessages.add(tmpUserContact)
                 numMessages = allUserMessages.value?.size ?: -1
                 Log.d("All messages length", numMessages.toString())
-
             }
 
             if (numMessages < userMessages.size && numMessages != -1) {
@@ -166,8 +114,6 @@ class ChatViewModel(
                 Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
 
             }
-
-
             Log.d("Messages", userMessages.toString())
         }
         return withContext(Dispatchers.IO) {
@@ -180,56 +126,12 @@ class ChatViewModel(
         }
     }
 
-    /**
-     *  Handling the case of the stopped app or forgotten recording,
-     *  the start and end times will be the same.j
-     *
-     *  If the start time and end time are not the same, then we do not have an unfinished
-     *  recording.
-     */
-    private suspend fun getUserMessageFromDatabase(): UserMessages? {
-        val newMessage = withContext(Dispatchers.IO) {
-
-            var userMessage = database.getUserMessage()
-            if (userMessage?.id == userMessage?.id) {
-                userMessage = null
-            }
-            userMessage
-        }
-        GlobalScope.launch {
-            withContext(Dispatchers.Main) {
-                _newMessageNotification.value = true
-            }
-        }
-
-        return newMessage
-    }
-
-    private suspend fun insert(userMessage: UserMessages) {
-        withContext(Dispatchers.IO) {
-            database.insert(userMessage)
-        }
-    }
-
-    private suspend fun update(userMessage: UserMessages) {
-        withContext(Dispatchers.IO) {
-            database.update(userMessage)
-        }
-    }
-
-    private suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            database.clear()
-        }
-    }
-
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
             newMessage.uid = uid
             newMessage.message = message
             newMessage.contact_id = userContactKey
-            Log.d("Message", message)
 
             CavojskyWebService.sendMessageToContact(
                 userContactKey.toString(),
@@ -240,26 +142,7 @@ class ChatViewModel(
                 AsyncTask.execute {
                     database.insert(newMessage)
                 }
-
             }
-            _newUserMessages.value = getUserMessageFromDatabase()
-
-        }
-    }
-
-    /**
-     * Executes when the CLEAR button is clicked.
-     */
-    fun onClear() {
-        uiScope.launch {
-            // Clear the database table.
-            clear()
-
-            // And clear tonight since it's no longer in the database
-            _newUserMessages.value = null
-
-            // Show a snackbar message, because it's friendly.
-            _showSnackbarEvent.value = true
         }
     }
 

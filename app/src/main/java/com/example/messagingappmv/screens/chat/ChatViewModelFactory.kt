@@ -18,13 +18,12 @@ package com.example.messagingappmv.screens.chat
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.messagingappmv.database.UserContactDatabaseDao
 import com.example.messagingappmv.database.UserMessagesDatabaseDao
 
 /**
  * This is pretty much boiler plate code for a ViewModel Factory.
  *
- * Provides the key for the night and the SleepDatabaseDao to the ViewModel.
+ * Provides the key for the UserChat and the UserMessagesDatabaseDao to the ViewModel.
  */
 class ChatViewModelFactory(
     private val userContactKey: Long,
