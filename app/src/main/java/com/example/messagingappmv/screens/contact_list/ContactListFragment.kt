@@ -15,14 +15,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.messagingappmv.MainActivity
-import com.example.messagingappmv.database.UserContactDatabase
+import com.example.messagingappmv.database.UserDatabase
 import com.example.messagingappmv.R
 import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.fragment_contact_list.*
 
 import com.example.messagingappmv.databinding.FragmentContactListBinding
-import com.giphy.sdk.ui.views.GiphyDialogFragment
 
 class ContactListFragment : Fragment() {
     private lateinit var userContactViewModel: ContactListViewModel
@@ -41,7 +40,7 @@ class ContactListFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.title = getString(R.string.contact_list_title)
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = UserContactDatabase.getInstance(application).userContactDatabaseDao
+        val dataSource = UserDatabase.getInstance(application).userContactDatabaseDao
         val viewModelFactory = ContactListViewModelFactory(dataSource, application)
 
         // Get a reference to the ViewModel associated with this fragment.

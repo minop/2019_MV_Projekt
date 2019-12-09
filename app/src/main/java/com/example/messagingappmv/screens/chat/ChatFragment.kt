@@ -2,8 +2,6 @@ package com.example.messagingappmv.screens.chat
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,16 +12,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.MainActivity
 import com.example.messagingappmv.R
-import com.example.messagingappmv.database.UserContactDatabase
+import com.example.messagingappmv.database.UserDatabase
 import com.example.messagingappmv.databinding.FragmentChatBinding
-import com.example.messagingappmv.screens.contact_list.ContactListAdapter
-import com.example.messagingappmv.screens.contact_list.ContactListListener
-import com.example.messagingappmv.screens.contact_list.ContactListViewModel
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.ui.GPHSettings
@@ -33,10 +27,6 @@ import com.giphy.sdk.ui.themes.LightTheme
 import com.giphy.sdk.ui.views.GiphyDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_chat.*
-import kotlinx.android.synthetic.main.fragment_contact_list.*
-import kotlinx.android.synthetic.main.fragment_contact_list.user_contact_list
-import okhttp3.internal.wait
-import okhttp3.internal.waitMillis
 
 
 class ChatFragment : Fragment() {
@@ -61,7 +51,7 @@ class ChatFragment : Fragment() {
         Log.d("ContactUid", arguments.toString())
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = UserContactDatabase.getInstance(application).userMessagesDatabaseDao
+        val dataSource = UserDatabase.getInstance(application).userMessagesDatabaseDao
         val viewModelFactory =
             ChatViewModelFactory(arguments.userContactKey, dataSource, application)
 

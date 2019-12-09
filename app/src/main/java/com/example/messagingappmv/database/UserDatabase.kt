@@ -20,8 +20,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.messagingappmv.database.UserContactDatabaseDao
-import com.example.messagingappmv.database.UserContact
 
 /**
  * A database that stores UserContact information.
@@ -31,7 +29,7 @@ import com.example.messagingappmv.database.UserContact
  * so you can reuse it.
  */
 @Database(entities = [UserContact::class, UserMessages::class], version = 2, exportSchema = false)
-abstract class UserContactDatabase : RoomDatabase() {
+abstract class UserDatabase : RoomDatabase() {
 
     /**
      * Connects the database to the DAO.
@@ -40,10 +38,10 @@ abstract class UserContactDatabase : RoomDatabase() {
     abstract val userMessagesDatabaseDao: UserMessagesDatabaseDao
 
     /**
-     * Define a companion object, this allows us to add functions on the UserContactDatabase class.
+     * Define a companion object, this allows us to add functions on the UserDatabase class.
      *
-     * For example, clients can call `UserContactDatabase.getInstance(context)` to instantiate
-     * a new UserContactDatabase.
+     * For example, clients can call `UserDatabase.getInstance(context)` to instantiate
+     * a new UserDatabase.
      */
     companion object {
         /**
@@ -56,7 +54,7 @@ abstract class UserContactDatabase : RoomDatabase() {
          *  thread to shared data are visible to other threads.
          */
         @Volatile
-        private var INSTANCE: UserContactDatabase? = null
+        private var INSTANCE: UserDatabase? = null
 
         /**
          * Helper function to get the database.
@@ -75,7 +73,7 @@ abstract class UserContactDatabase : RoomDatabase() {
          *
          * @param context The application context Singleton, used to get access to the filesystem.
          */
-        fun getInstance(context: Context): UserContactDatabase {
+        fun getInstance(context: Context): UserDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -89,7 +87,7 @@ abstract class UserContactDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                             context.applicationContext,
-                            UserContactDatabase::class.java,
+                            UserDatabase::class.java,
                             "user_contact_history_database"
                     )
                             // Wipes and rebuilds instead of migrating if no Migration object.
