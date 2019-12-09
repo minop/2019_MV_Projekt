@@ -29,5 +29,9 @@ data class UserContact(
         var user_id: Long = 0L,
 
         @ColumnInfo(name = "username")
-        var user_name: String = ""
+        var user_name: String = "",
+
+        //We also need a way to determine if the contact is actually in the contact list, or just in a room the user visited
+        @ColumnInfo(name = "isInContacts")
+        var is_in_contacts: Boolean = false
 )

@@ -68,6 +68,9 @@
         <action
             android:id="@+id/action_roomFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
+        <argument
+            android:name="roomContactKey"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
