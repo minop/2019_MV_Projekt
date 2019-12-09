@@ -15,11 +15,13 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
 
     private lateinit var viewModel: LoginViewModel
+    private lateinit var viewModelFactory: LoginViewModelFactory
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        viewModelFactory = LoginViewModelFactory(this.context!!)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
 
         return binding.root
     }

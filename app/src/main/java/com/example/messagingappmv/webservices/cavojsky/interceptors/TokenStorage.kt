@@ -2,6 +2,8 @@ package com.example.messagingappmv.webservices.cavojsky.interceptors
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import java.io.FileNotFoundException
 
 object TokenStorage {
 
@@ -17,7 +19,17 @@ object TokenStorage {
     }
 
     fun load(context: Context): LoginData {
-        val stringData = context.openFileInput(this.STORAGE_FILE_NAME).readBytes().toString(Charsets.UTF_8)
-        return gson.fromJson(stringData, LoginData::class.java)
+        return safeLoad(context)!!
+    }
+
+    fun safeLoad(context: Context): LoginData? {
+        return try {
+            val stringData = context.openFileInput(this.STORAGE_FILE_NAME).readBytes().toString(Charsets.UTF_8)
+            gson.fromJson(stringData, LoginData::class.java)
+        } catch (e: FileNotFoundException) {
+            null
+        } catch (e: JsonSyntaxException) {
+            null
+        }
     }
 }
