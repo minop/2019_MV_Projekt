@@ -37,6 +37,8 @@ class ContactListFragment : Fragment() {
             inflater, R.layout.fragment_contact_list, container, false)
 
         val application = requireNotNull(this.activity).application
+
+        //Set Title of ActionBar
         (activity as MainActivity).supportActionBar?.title = getString(R.string.contact_list_title)
 
         // Create an instance of the ViewModel Factory.
@@ -58,12 +60,10 @@ class ContactListFragment : Fragment() {
         })
         binding.userContactList.adapter = adapter
 
-
         userContactViewModel.userContactList.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
                 user_contact_list.smoothScrollToPosition(0)
-
             }
         })
 
@@ -71,28 +71,12 @@ class ContactListFragment : Fragment() {
         // This is necessary so that the binding can observe LiveData updates.
         binding.setLifecycleOwner(this)
 
-        // Add an Observer on the state variable for showing a Snackbar message
-        // when the CLEAR button is pressed.
-        userContactViewModel.showSnackBarEvent.observe(this, Observer {
-            if (it == true) { // Observed state is true.
-                Snackbar.make(
-                    activity!!.findViewById(android.R.id.content),
-                    getString(R.string.cleared_message),
-                    Snackbar.LENGTH_SHORT // How long to display the message.
-                ).show()
-                // Reset state to make sure the toast is only shown once, even if the device
-                // has a configuration change.
-                userContactViewModel.doneShowingSnackbar()
-            }
-        })
-
         // Add an Observer on the state variable for Navigating when and item is clicked.
-        userContactViewModel.navigateToChat.observe(this, Observer { night ->
-            night?.let {
-
+        userContactViewModel.navigateToChat.observe(this, Observer { contactUid ->
+            contactUid?.let {
                 this.findNavController().navigate(
                     ContactListFragmentDirections
-                        .actionContactListFragmentToChatFragment(night))
+                        .actionContactListFragmentToChatFragment(contactUid))
                 userContactViewModel.onChatNavigated()
             }
         })
@@ -101,17 +85,6 @@ class ContactListFragment : Fragment() {
         binding.userContactList.layoutManager = manager
 
         return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        start_button.setOnClickListener{
-            Log.d("Message", "In Listener")
-            userContactViewModel.onSend(editTextMessage.text.toString())
-            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
-            user_contact_list.smoothScrollToPosition(0)
-        }
     }
 }
 
