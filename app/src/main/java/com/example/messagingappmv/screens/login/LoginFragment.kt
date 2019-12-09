@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.example.messagingappmv.R
 import com.example.messagingappmv.databinding.FragmentLoginBinding
 
@@ -20,7 +21,7 @@ class LoginFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
-        viewModelFactory = LoginViewModelFactory(this.context!!)
+        viewModelFactory = LoginViewModelFactory(this.context!!, this.findNavController())
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
 
         return binding.root
