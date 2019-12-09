@@ -54,6 +54,9 @@
         <action
             android:id="@+id/action_roomListFragment_to_contactListFragment"
             app:destination="@id/contactListFragment" />
+        <action
+            android:id="@+id/action_roomListFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/roomFragment"
