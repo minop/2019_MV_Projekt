@@ -5,7 +5,7 @@ import android.util.Log
 import retrofit2.Call
 import java.lang.IllegalStateException
 
-class WebserviceTask<T>(private val callback : (T?) -> Any) : AsyncTask<Call<T>, Void, T?>() {
+class WebserviceTask<T>(private val callback : (T?) -> Unit, private val callbackError: () -> Unit = {}) : AsyncTask<Call<T>, Void, T?>() {
 
     override fun doInBackground(vararg request: Call<T>?): T? {
         val response = request[0]!!.execute()
@@ -14,10 +14,15 @@ class WebserviceTask<T>(private val callback : (T?) -> Any) : AsyncTask<Call<T>,
             return response.body()
 
         Log.e("Webservice call failed", response.errorBody()!!.string())
-        throw IllegalStateException("Webservice call failed")
+        this.cancel(true)
+        return null
     }
 
     override fun onPostExecute(result: T?) {
         callback.invoke(result)
+    }
+
+    override fun onCancelled() {
+        callbackError.invoke()
     }
 }
