@@ -13,7 +13,7 @@ class WebserviceTask<T>(private val callback : (T?) -> Unit, private val callbac
         if(response.isSuccessful)
             return response.body()
 
-        Log.e("Webservice call failed", response.errorBody()!!.string())
+        Log.e("Webservice call failed", String.format("%d %s %s",response.raw().code, response.raw().message, response.raw().request.toString()))
         this.cancel(true)
         return null
     }
