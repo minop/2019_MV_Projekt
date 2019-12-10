@@ -12,10 +12,7 @@ object TokenStorage {
     private val gson = Gson()
 
     fun save(data: LoginData, context: Context) {
-        val stringData = gson.toJson(data)
-        context.openFileOutput(this.STORAGE_FILE_NAME, Context.MODE_PRIVATE).use {
-            it.write(stringData.toByteArray(Charsets.UTF_8))
-        }
+        this.write(gson.toJson(data), context)
     }
 
     fun load(context: Context): LoginData {
@@ -30,6 +27,16 @@ object TokenStorage {
             null
         } catch (e: JsonSyntaxException) {
             null
+        }
+    }
+
+    fun delete(context: Context) {
+        this.write("", context)
+    }
+
+    private fun write(data: String, context: Context) {
+        context.openFileOutput(this.STORAGE_FILE_NAME, Context.MODE_PRIVATE).use {
+            it.write(data.toByteArray(Charsets.UTF_8))
         }
     }
 }
