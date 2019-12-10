@@ -21,6 +21,7 @@ class LoginFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         binding.loginViewModel = viewModel
+        binding.lifecycleOwner = this
 
         binding.buttonLogin.setOnClickListener {
             viewModel.login(this.context!!, this.findNavController())
