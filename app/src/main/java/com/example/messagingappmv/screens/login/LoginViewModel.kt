@@ -20,9 +20,11 @@ class LoginViewModel : ViewModel() {
     }
 
     fun login(context: Context, navController: NavController) {
-        CavojskyWebService.login(username.value!!, password.value!!, context) {
+        error.value = ""
+        CavojskyWebService.login(username.value!!, password.value!!, context, {
             navController.navigate(R.id.action_loginFragment_to_roomListFragment)
-        }
-        // TODO login fails
+        }, {
+            error.value = "login failed"
+        })
     }
 }

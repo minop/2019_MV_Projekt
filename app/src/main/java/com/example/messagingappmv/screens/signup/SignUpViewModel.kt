@@ -22,14 +22,16 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun register(context: Context, navController: NavController) {
+        error.value = ""
         if(password.value.equals(password2.value)) {
-            CavojskyWebService.register(username.value!!, password.value!!, context) {
+            CavojskyWebService.register(username.value!!, password.value!!, context, {
                 navController.navigate(R.id.action_signUpFragment_to_roomListFragment)
-            }
-            // TODO registration fails
+            }, {
+                error.value = "registration failed"
+            })
         }
         else {
-            // TODO error
+            error.value = "passwords must match!"
         }
     }
 }
