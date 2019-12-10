@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.messagingappmv.R
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
-import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 
 class LoginViewModel(context: Context, navController: NavController) : ViewModel() {
     var username = ""

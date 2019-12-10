@@ -16,13 +16,15 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
 
     private lateinit var viewModel: LoginViewModel
-    private lateinit var viewModelFactory: LoginViewModelFactory
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
-        viewModelFactory = LoginViewModelFactory(this.context!!, this.findNavController())
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+
+        binding.buttonLogin.setOnClickListener {
+            viewModel.login(this.context!!, this.findNavController())
+        }
 
         return binding.root
     }
