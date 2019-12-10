@@ -19,8 +19,8 @@ class LoginFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
-
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        binding.loginViewModel = viewModel
 
         binding.buttonLogin.setOnClickListener {
             viewModel.login(this.context!!, this.findNavController())
