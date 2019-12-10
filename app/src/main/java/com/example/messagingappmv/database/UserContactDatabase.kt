@@ -30,7 +30,7 @@ import com.example.messagingappmv.database.UserContact
  * This pattern is pretty much the same for any database,
  * so you can reuse it.
  */
-@Database(entities = [UserContact::class, UserMessages::class], version = 1, exportSchema = false)
+@Database(entities = [UserContact::class, UserMessages::class], version = 2, exportSchema = false)
 abstract class UserContactDatabase : RoomDatabase() {
 
     /**

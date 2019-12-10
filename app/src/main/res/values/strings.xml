@@ -4,13 +4,11 @@
     <string name="clear">Clear</string>
     <string name="start">Start</string>
     <string name="textMessage">Default Name</string>
-    <string name="roomName">Default Room Name</string>
     <string name="cleared_message">All your data is gone forever.</string>
     <string name="close">Close</string>
     <string name="back">Back</string>
     <string name="send">Send</string>
     <string name="contact_list_title">Contact List</string>
-    <string name="room_list_title">Room List</string>
     <string name="chat_title">Messages</string>
     <string name="long_message_test">MessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessagesMessages</string>
 

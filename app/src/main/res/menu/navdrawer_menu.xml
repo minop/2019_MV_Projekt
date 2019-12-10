@@ -6,7 +6,7 @@
         android:icon="@android:drawable/ic_delete"
         android:title="ContactListFragment" />
     <item
-        android:id="@+id/roomListFragment"
+        android:id="@+id/roomFragment"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="RoomListFragment" />
+        android:title="RoomFragment" />
 </menu>
