@@ -11,9 +11,12 @@ class LoginViewModel : ViewModel() {
     val username = MutableLiveData<String>()
     val password = MutableLiveData<String>()
 
+    val error = MutableLiveData<String>()
+
     init {
         username.value = ""
         password.value = ""
+        error.value = ""
     }
 
     fun login(context: Context, navController: NavController) {

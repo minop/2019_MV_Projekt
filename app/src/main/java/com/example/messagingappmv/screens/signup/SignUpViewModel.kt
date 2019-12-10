@@ -12,10 +12,13 @@ class SignUpViewModel : ViewModel() {
     val password = MutableLiveData<String>()
     val password2 = MutableLiveData<String>()
 
+    val error = MutableLiveData<String>()
+
     init {
         username.value = ""
         password.value = ""
         password2.value = ""
+        error.value = ""
     }
 
     fun register(context: Context, navController: NavController) {
