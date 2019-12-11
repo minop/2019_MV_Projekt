@@ -1,8 +1,8 @@
 package com.example.messagingappmv.webservices.firebase
 
-import android.util.Log
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
+import com.example.messagingappmv.webservices.firebase.events.FirebaseEventManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -13,20 +13,13 @@ class Firebase : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d("", "From: ${message.from}")
-
-        // Check if message contains a data payload.
-        message.data.isNotEmpty().let {
-            Log.d("", "Message data payload: " + message.data)
+        if(message.data.isNotEmpty()) {
+            if(message.data.get("type").equals(FirebaseWebService.TYPE_USER)) {
+                FirebaseEventManager.publishDMEvent(message.data.get("identifier")!!.toLong())
+            }
+            else if(message.data.get("type").equals(FirebaseWebService.TYPE_ROOM)) {
+                FirebaseEventManager.publishRoomEvent(message.data.get("identifier")!!)
+            }
         }
-
-        // Check if message contains a notification payload.
-        message.notification?.let {
-            Log.d("", "Message Notification Body: ${it.body}")
-        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
 }
