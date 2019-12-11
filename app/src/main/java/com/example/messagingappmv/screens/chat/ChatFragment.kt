@@ -2,9 +2,6 @@ package com.example.messagingappmv.screens.chat
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,64 +11,95 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.MainActivity
 import com.example.messagingappmv.R
-import com.example.messagingappmv.database.UserContactDatabase
+import com.example.messagingappmv.database.UserDatabase
 import com.example.messagingappmv.databinding.FragmentChatBinding
-import com.example.messagingappmv.screens.contact_list.ContactListAdapter
-import com.example.messagingappmv.screens.contact_list.ContactListListener
-import com.example.messagingappmv.screens.contact_list.ContactListViewModel
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
+import com.giphy.sdk.core.models.Media
+import com.giphy.sdk.ui.GPHSettings
+import com.giphy.sdk.ui.GiphyCoreUI
+import com.giphy.sdk.ui.themes.GridType
+import com.giphy.sdk.ui.themes.LightTheme
+import com.giphy.sdk.ui.views.GiphyDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_chat.*
-import kotlinx.android.synthetic.main.fragment_contact_list.*
-import kotlinx.android.synthetic.main.fragment_contact_list.user_contact_list
 
 
 class ChatFragment : Fragment() {
     private lateinit var userMessagesViewModel: ChatViewModel
-
+    private lateinit var manager: LinearLayoutManager
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentChatBinding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_chat, container, false)
+            inflater, R.layout.fragment_chat, container, false
+        )
 
         val application = requireNotNull(this.activity).application
+
         (activity as MainActivity).supportActionBar?.title = getString(R.string.chat_title)
 
+        val uid = context?.let { TokenStorage.load(it).uid }!!.toLong()
         val arguments = ChatFragmentArgs.fromBundle(arguments)
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = UserContactDatabase.getInstance(application).userMessagesDatabaseDao
-        val viewModelFactory = ChatViewModelFactory(arguments.userContactKey, dataSource)
+        val dataSource = UserDatabase.getInstance(application).userMessagesDatabaseDao
+        val viewModelFactory =
+            ChatViewModelFactory(arguments.userContactKey, dataSource, application)
 
         // Get a reference to the ViewModel associated with this fragment.
         userMessagesViewModel =
             ViewModelProviders.of(
-                this, viewModelFactory).get(ChatViewModel::class.java)
+                this, viewModelFactory
+            ).get(ChatViewModel::class.java)
 
         // To use the View Model with data binding, you have to explicitly
         // give the binding object a reference to it.
         binding.chatViewModel = userMessagesViewModel
 
-        val adapter = ChatAdapter(ChatListener { id ->
+        val adapter = ChatAdapter(uid, arguments.userContactKey, ChatListener { id ->
             Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
             userMessagesViewModel.onUserContactClicked(id)
         })
         binding.userMessages.adapter = adapter
 
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                user_messages.scrollToPosition(0)
+                Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                user_messages.scrollToPosition(0)
+                Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                user_messages.scrollToPosition(0)
+                Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                user_messages.scrollToPosition(0)
+                Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                user_messages.scrollToPosition(0)
+                Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
+            }
+        })
+
 
         userMessagesViewModel.allUserMessages.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.addHeaderAndSubmitList(it)
-                user_messages.smoothScrollToPosition(0)
-
             }
         })
 
@@ -79,56 +107,56 @@ class ChatFragment : Fragment() {
         // This is necessary so that the binding can observe LiveData updates.
         binding.setLifecycleOwner(this)
 
-        // Add an Observer on the state variable for showing a Snackbar message
-        // when the CLEAR button is pressed.
-        userMessagesViewModel.showSnackBarEvent.observe(this, Observer {
-            if (it == true) { // Observed state is true.
-                Snackbar.make(
-                    activity!!.findViewById(android.R.id.content),
-                    getString(R.string.cleared_message),
-                    Snackbar.LENGTH_SHORT // How long to display the message.
-                ).show()
-                // Reset state to make sure the toast is only shown once, even if the device
-                // has a configuration change.
-                userMessagesViewModel.doneShowingSnackbar()
-            }
-        })
-
-
-        val manager = LinearLayoutManager(activity)
-        manager.setReverseLayout(true)
+        manager = LinearLayoutManager(activity)
+        manager.reverseLayout = true
 
         binding.userMessages.layoutManager = manager
+
         return binding.root
     }
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        send_button.setOnClickListener{
-            Log.d("Message", "In Listener")
-            userMessagesViewModel.onSend(editTextMessageChat.text.toString())
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+
+        super.onActivityCreated(savedInstanceState)
+        context?.let {
+            GiphyCoreUI.configure(
+                context = it,
+                apiKey = "TMyIPe2V232AT5Y3LF2GtyFf1qrpBzSf",
+                verificationMode = false
+            )
+        }
+
+        send_button.setOnClickListener {
+            val newMessage = editTextMessageChat.text.toString()
+            if (newMessage != "") {
+                userMessagesViewModel.onSend(newMessage)
+                editTextMessageChat.text.clear()
+            } else {
+                Snackbar.make(
+                    activity!!.findViewById(android.R.id.content),
+                    getString(R.string.empty_message),
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
-
-
         }
-        editTextMessageChat.addTextChangedListener(
-            object : TextWatcher {
 
-                override fun afterTextChanged(s: Editable) {
-                    user_messages.smoothScrollToPosition(0)
-
+        send_gif_button.setOnClickListener {
+            val settings =
+                GPHSettings(gridType = GridType.waterfall, theme = LightTheme, dimBackground = true)
+            val gifsDialog = GiphyDialogFragment.newInstance(settings)
+            fragmentManager?.let { gifsDialog.show(it, "gifs_dialog") }
+            gifsDialog.gifSelectionListener = object : GiphyDialogFragment.GifSelectionListener {
+                override fun onGifSelected(media: Media) {
+                    val newMessage = "gif:" + media.id
+                    userMessagesViewModel.onSend(newMessage)
                 }
 
-                override fun beforeTextChanged(s: CharSequence, start: Int,
-                                               count: Int, after: Int) {
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int,
-                                           before: Int, count: Int) {
-                    user_messages.smoothScrollToPosition(0)
+                override fun onDismissed() {
+                    //Your user dismissed the dialog without selecting a GIF
                 }
             }
-        )
+        }
     }
 }

@@ -10,12 +10,15 @@ buildscript {
         navigationVersion = '1.0.0-alpha07'
         dataBindingCompilerVersion = gradleVersion // Always need to be the same.
         supportlibVersion = '1.0.0'
+        version_glide = "4.8.0"
     }
 
     repositories {
         google()
         jcenter()
-
+        maven {
+            url "http://giphy.bintray.com/giphy-sdk"
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
