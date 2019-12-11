@@ -75,16 +75,17 @@ class ChatViewModel(
 
     init {
         initializeUserContact()
+
+        FirebaseEventManager.subscribe { uid_fid ->
+            uiScope.launch {
+                getUserMessagesFromDatabase()
+            }
+        }
     }
 
     private fun initializeUserContact() {
         uiScope.launch {
-            _newUserMessages.value = getUserMessagesFromDatabase(
-                userContactKey,
-                context,
-                allUserMessages,
-                database
-            ) { message ->
+            _newUserMessages.value = getUserMessagesFromDatabase { message ->
                 if (message.uid == uid.toString()) {
                     contactFID = message.contact_fid
                     myUsername = message.uid_name
@@ -94,26 +95,9 @@ class ChatViewModel(
                 }
             }
         }
-
-        FirebaseEventManager.subscribe { uid_fid ->
-            uiScope.launch {
-                withContext(Dispatchers.IO) {
-                    getUserMessagesFromDatabase(
-                        userContactKey,
-                        context,
-                        allUserMessages,
-                        database
-                    )
-                }
-            }
-        }
     }
 
-    suspend fun getUserMessagesFromDatabase(
-        userContactKey: Long,
-        context: Context,
-        allUserMessages: LiveData<List<UserMessages>>,
-        database: UserMessagesDatabaseDao,
+    private suspend fun getUserMessagesFromDatabase(
         fillMetadataCallback: (ContactReadItem) -> Unit = {}
     ): UserMessages? {
         val userMessages = mutableListOf<UserMessages>()
@@ -154,6 +138,8 @@ class ChatViewModel(
 
             }
             Log.d("Messages", userMessages.toString())
+
+            fillMetadataCallback.invoke(messages.last())
         })
         return withContext(Dispatchers.IO) {
 
