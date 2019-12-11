@@ -17,9 +17,11 @@ package com.example.messagingappmv.screens.chat
  */
 
 import android.app.Application
+import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.messagingappmv.database.UserMessages
@@ -73,26 +75,21 @@ class ChatViewModel(
     }
 
     private fun initializeUserContact() {
-        val async = uiScope.async {
-            _newUserMessages.value = getUserMessagesFromDatabase(/*userContactKey, context, allUserMessages, database*/)
-        }
         uiScope.launch {
-            async.await()
-            withContext(Dispatchers.IO) {
-                val lastMessage = database.getUserMessage()!!
-                if (lastMessage.uid == uid) {
-                    contactFID = lastMessage.contact_fid
-                    myUsername = lastMessage.uid_name
+            _newUserMessages.value = getUserMessagesFromDatabase(userContactKey, context, allUserMessages, database) { message ->
+                if (message.uid == uid.toString()) {
+                    contactFID = message.contact_fid
+                    myUsername = message.uid_name
                 } else {
-                    contactFID = lastMessage.uid_fid
-                    myUsername = lastMessage.contact_name
+                    contactFID = message.uid_fid
+                    myUsername = message.contact_name
                 }
             }
         }
     }
 
-//    companion object {
-        private suspend fun getUserMessagesFromDatabase(/*userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao*/): UserMessages? {
+    companion object {
+        private suspend fun getUserMessagesFromDatabase(userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao, fillMetadataCallback : (ContactReadItem) -> Unit = {}): UserMessages? {
             val userMessages = mutableListOf<UserMessages>()
 
             Log.d("Uid Login user", TokenStorage.load(context).uid)
@@ -133,6 +130,8 @@ class ChatViewModel(
 
                 }
                 Log.d("Messages", userMessages.toString())
+
+                fillMetadataCallback.invoke(messages.last())
             })
             return withContext(Dispatchers.IO) {
 
@@ -143,7 +142,7 @@ class ChatViewModel(
                 userContact
             }
         }
-//    }
+    }
 
     fun onSend(message: String) {
         uiScope.launch {
