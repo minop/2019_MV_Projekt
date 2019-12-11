@@ -11,17 +11,10 @@ import java.time.ZoneId
 
 @Entity(tableName = "room_contact_list")
 data class RoomContact(
-    @PrimaryKey(autoGenerate = true)
-    var room_id: Long = 0L,
-
-    @ColumnInfo(name = "ssid")
+    @PrimaryKey(autoGenerate = false)
     var ssid: String = ""
 ){
     constructor(roomResponse: RoomListItem) : this(){
         this.ssid = roomResponse.roomid
-    }
-
-    constructor(ssid: String) : this(){
-        this.ssid = ssid
     }
 }

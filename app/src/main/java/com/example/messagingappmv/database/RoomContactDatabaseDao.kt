@@ -26,7 +26,7 @@ interface RoomContactDatabaseDao {
     /**
      * Selects and returns the latest record.
      */
-    @Query("SELECT * FROM room_contact_list ORDER BY room_id DESC LIMIT 1")
+    @Query("SELECT * FROM room_contact_list ORDER BY ssid DESC LIMIT 1")
     fun getRoomContact(): RoomContact?
 
     @Query("DELETE FROM room_contact_list")

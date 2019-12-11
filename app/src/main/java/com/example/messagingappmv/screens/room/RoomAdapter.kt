@@ -7,10 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.database.UserPosts
-import com.example.messagingappmv.databinding.ListItemRoomContactBinding
+import com.example.messagingappmv.databinding.*
 
-import com.example.messagingappmv.databinding.ListItemRoomUserBinding
-import com.example.messagingappmv.databinding.ListItemRoomUsersContactBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class RoomAdapter(    
     private val uid: Long,
-    private val contactUid: Long,
+    private val roomid: String,
     val clickListener: RoomListener
 ) :
     ListAdapter<DataItem, RecyclerView.ViewHolder>(RoomDiffCallback()) {
@@ -185,17 +183,20 @@ class RoomListener(val clickListener: (userId: Long) -> Unit) {
 sealed class DataItem {
     abstract val id: Long
     abstract val uid: Long
+    abstract val roomid: String
     abstract val post: String
 
     data class UserPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
+        override val roomid = userPost.room_id
         override val post = userPost.post
     }
 
     data class ContactPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
+        override val roomid = userPost.room_id
         override val post = userPost.post
     }
 }

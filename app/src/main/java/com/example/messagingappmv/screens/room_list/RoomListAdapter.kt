@@ -40,7 +40,7 @@ class RoomListAdapter(val clickListener: RoomListListener) : ListAdapter<RoomCon
 class RoomListDiffCallback : DiffUtil.ItemCallback<RoomContact>() {
 
     override fun areItemsTheSame(oldItem: RoomContact, newItem: RoomContact): Boolean {
-        return oldItem.room_id == newItem.room_id
+        return oldItem.ssid == newItem.ssid
     }
 
     override fun areContentsTheSame(oldItem: RoomContact, newItem: RoomContact): Boolean {
@@ -49,6 +49,6 @@ class RoomListDiffCallback : DiffUtil.ItemCallback<RoomContact>() {
 }
 
 
-class RoomListListener(val clickListener: (room_id: Long) -> Unit) {
-    fun onClick(RoomContact: RoomContact) = clickListener(RoomContact.room_id)
+class RoomListListener(val clickListener: (id: String) -> Unit) {
+    fun onClick(RoomContact: RoomContact) = clickListener(RoomContact.ssid)
 }

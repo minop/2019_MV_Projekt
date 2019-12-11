@@ -37,7 +37,7 @@ import kotlinx.coroutines.*
  * @param sleepNightKey The key of the current night we are working on.
  */
 class RoomViewModel(
-    private val roomContactKey: Long = 0L,
+    private val roomContactKey: String = "",
     dataSource: UserPostsDatabaseDao,
     application: Application
 
@@ -56,7 +56,7 @@ class RoomViewModel(
 
     private var newUserPosts = MutableLiveData<UserPosts?>()
     val allUserPosts = database.getAllUserPosts(uid, roomContactKey)
-    
+
     /**
      * Navigation for the Chat fragment.
      */
@@ -75,69 +75,67 @@ class RoomViewModel(
             newUserPosts.value = getUserPostsFromDatabase()
         }
     }
-    
+
     private suspend fun getUserPostsFromDatabase(): UserPosts? {
-        val userMessages = mutableListOf<UserPosts>()
+        val userPosts = mutableListOf<UserPosts>()
 
         Log.d("Uid Login user", TokenStorage.load(context).uid)
-        Log.d("Room Uid", roomContactKey.toString())
+        Log.d("Room ssid", roomContactKey)
         var numMessages = -1
 
-        CavojskyWebService.getRoomMessages(roomContactKey.toString(), context, { posts ->
+        CavojskyWebService.getRoomMessages(roomContactKey, context, { posts ->
             Log.d("ContactListItem", posts.toString())
             for (item: RoomReadItem in posts) {
                 val tmpRoomContact = UserPosts(
                     item.uid.toLong(),
-                    item.contact.toLong(),
-                    item.message,
-                    item.time,
-                    item.uid_name,
-                    item.contact_name
+                    item.roomid,
+                    item.message
                 )
-                userMessages.add(tmpRoomContact)
-                numMessages = allUserMessages.value?.size ?: -1
+                userPosts.add(tmpRoomContact)
+                numMessages = allUserPosts.value?.size ?: -1
                 Log.d("All posts length", numMessages.toString())
             }
 
-            if (numMessages < userMessages.size && numMessages != -1) {
+            if (numMessages < userPosts.size && numMessages != -1) {
                 AsyncTask.execute {
                     database.insertAll(
-                        userMessages.subList(
+                        userPosts.subList(
                             numMessages,
-                            userMessages.size
+                            userPosts.size
                         )
                     )
                 }
-                Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "New Posts", Toast.LENGTH_LONG).show()
 
             } else {
                 Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
 
             }
-            Log.d("Messages", userMessages.toString())
+            Log.d("Posts", userPosts.toString())
         })
         return withContext(Dispatchers.IO) {
 
-            var userContact = database.getUserMessage()
-            if (userContact?.uid_name == userContact?.uid_name) {
-                userContact = null
+            var roomContact = database.getUserPost()
+            if (roomContact?.room_id == roomContact?.room_id) {
+                roomContact = null
             }
-            userContact
+            roomContact
         }
     }
 
     fun onSend(post: String) {
         uiScope.launch {
             val newPost = UserPosts()
-            newPost.uid = 8
+            newPost.uid = uid
             newPost.post = post
+            newPost.room_id = roomContactKey
 
-            CavojskyWebService.sendMessageToContact(
-                roomContactKey.toString(),
-                message,
+            CavojskyWebService.sendMessageToRoom(
+                roomContactKey,
+                post,
                 context, {
                     AsyncTask.execute {
-                        database.insert(newMessage)
+                        database.insert(newPost)
                     }
                 })
         }

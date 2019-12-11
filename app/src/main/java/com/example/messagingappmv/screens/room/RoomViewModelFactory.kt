@@ -15,6 +15,7 @@ package com.example.messagingappmv.screens.room
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.messagingappmv.database.UserContactDatabaseDao
@@ -26,12 +27,14 @@ import com.example.messagingappmv.database.UserPostsDatabaseDao
  * Provides the key for the night and the SleepDatabaseDao to the ViewModel.
  */
 class RoomViewModelFactory(
-    private val roomContactKey: Long,
-    private val dataSource: UserPostsDatabaseDao) : ViewModelProvider.Factory {
+    private val roomContactKey: String,
+    private val dataSource: UserPostsDatabaseDao,
+    private val application: Application
+) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RoomViewModel::class.java)) {
-            return RoomViewModel(roomContactKey, dataSource) as T
+            return RoomViewModel(roomContactKey, dataSource, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -51,6 +51,9 @@ interface UserPostsDatabaseDao {
     @Query("SELECT * from user_posts WHERE uid = :key")
     fun get(key: Long): UserPosts
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll( contacts: List<UserPosts>)
+
     /**
      * Deletes all values from the table.
      *
@@ -65,7 +68,7 @@ interface UserPostsDatabaseDao {
      * sorted by start time in descending order.
      */
     @Query("SELECT * FROM user_posts WHERE (uid = :uid AND room_id = :room_id) ORDER BY id DESC")
-    fun getAllUserPosts(uid: Long, room_id: Long): LiveData<List<UserPosts>>
+    fun getAllUserPosts(uid: Long, room_id: String): LiveData<List<UserPosts>>
 
     /**
      * Selects and returns the latest record.

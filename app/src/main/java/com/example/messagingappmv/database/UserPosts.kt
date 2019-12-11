@@ -9,9 +9,6 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "user_posts")
 data class UserPosts(
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0L,
-
     @ColumnInfo(name = "uid")
     var uid: Long = 0L,
 
@@ -20,4 +17,7 @@ data class UserPosts(
 
     @ColumnInfo(name = "post")
     var post: String = ""
-)
+){
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0L
+}

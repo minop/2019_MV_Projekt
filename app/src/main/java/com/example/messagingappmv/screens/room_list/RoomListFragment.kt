@@ -22,7 +22,7 @@ import com.example.messagingappmv.database.RoomContactDatabase
 import com.example.messagingappmv.databinding.FragmentRoomListBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_contact_list.*
-import kotlinx.android.synthetic.main.fragment_contact_list.start_button
+import kotlinx.android.synthetic.main.fragment_room_list.start_button
 import kotlinx.android.synthetic.main.fragment_room_list.*
 
 class RoomListFragment : Fragment() {
@@ -63,9 +63,9 @@ class RoomListFragment : Fragment() {
         // give the binding object a reference to it.
         binding.roomListViewModel = roomListViewModel
 
-        val adapter = RoomListAdapter(RoomListListener { room_id ->
-            Toast.makeText(context, "${room_id}", Toast.LENGTH_LONG).show()
-            roomListViewModel.onRoomContactClicked(room_id)
+        val adapter = RoomListAdapter(RoomListListener { id ->
+            Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
+            roomListViewModel.onRoomContactClicked(id)
         })
         binding.roomContactList.adapter = adapter
 
@@ -98,12 +98,12 @@ class RoomListFragment : Fragment() {
         })
 
         // Add an Observer on the state variable for Navigating when and item is clicked.
-        roomListViewModel.navigateToRoom.observe(this, Observer { id ->
+        roomListViewModel.navigateToRoom.observe(this, Observer { data ->
             id?.let {
 
                 this.findNavController().navigate(
                     RoomListFragmentDirections
-                        .actionRoomListFragmentToRoomFragment(id))
+                        .actionRoomListFragmentToRoomFragment(data))
                 roomListViewModel.onRoomNavigated()
             }
         })
