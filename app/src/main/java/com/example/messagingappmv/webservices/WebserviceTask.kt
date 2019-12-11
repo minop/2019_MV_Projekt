@@ -1,9 +1,8 @@
-package com.example.messagingappmv.webservices.cavojsky
+package com.example.messagingappmv.webservices
 
 import android.os.AsyncTask
 import android.util.Log
 import retrofit2.Call
-import java.lang.IllegalStateException
 
 class WebserviceTask<T>(private val callback : (T?) -> Unit, private val callbackError: () -> Unit = {}) : AsyncTask<Call<T>, Void, T?>() {
 

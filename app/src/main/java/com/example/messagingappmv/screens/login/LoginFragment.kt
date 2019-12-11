@@ -25,7 +25,7 @@ class LoginFragment : Fragment() {
         binding.lifecycleOwner = this
 
         // dirty but effective
-        if (TokenStorage.safeLoad(this.context!!) != null)
+        if (TokenStorage.containsToken(this.context!!))
             TokenStorage.delete(this.context!!)
 
         binding.buttonLogin.setOnClickListener {

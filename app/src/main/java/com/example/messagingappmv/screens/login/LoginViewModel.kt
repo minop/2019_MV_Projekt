@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.messagingappmv.R
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.firebase.FirebaseWebService
 
 class LoginViewModel : ViewModel() {
     val username = MutableLiveData<String>()
@@ -22,6 +23,7 @@ class LoginViewModel : ViewModel() {
     fun login(context: Context, navController: NavController) {
         error.value = ""
         CavojskyWebService.login(username.value!!, password.value!!, context, {
+            FirebaseWebService.forceTokenRegistration(context)
             navController.navigate(R.id.action_loginFragment_to_roomListFragment)
         }, {
             error.value = "login failed"
