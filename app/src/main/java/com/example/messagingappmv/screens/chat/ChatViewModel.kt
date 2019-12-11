@@ -115,7 +115,7 @@ class ChatViewModel(
 
             }
             Log.d("Messages", userMessages.toString())
-        } )
+        })
         return withContext(Dispatchers.IO) {
 
             var userContact = database.getUserMessage()
@@ -136,13 +136,11 @@ class ChatViewModel(
             CavojskyWebService.sendMessageToContact(
                 userContactKey.toString(),
                 message,
-                context
-            )
-            {
-                AsyncTask.execute {
-                    database.insert(newMessage)
-                }
-            }
+                context, {
+                    AsyncTask.execute {
+                        database.insert(newMessage)
+                    }
+                })
         }
     }
 
