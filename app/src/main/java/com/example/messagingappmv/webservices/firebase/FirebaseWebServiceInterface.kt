@@ -7,7 +7,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface FirebaseWebServiceInterface {
-    @POST
+    @POST("/fcm/send")
     @Headers("Authorization: key=AIzaSyAKD0XerNvC7D6SfSvN6je4UaasUdfClIc")
     fun sendMessage(@Body body: MessageRequest) : Call<Unit>
 }

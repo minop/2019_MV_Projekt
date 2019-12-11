@@ -28,6 +28,7 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
+import com.example.messagingappmv.webservices.firebase.FirebaseWebService
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
@@ -92,7 +93,9 @@ class ChatViewModel(
                     item.message,
                     item.time,
                     item.uid_name,
-                    item.contact_name
+                    item.contact_name,
+                    item.uid_fid,
+                    item.contact_fid
                 )
                 userMessages.add(tmpUserContact)
                 numMessages = allUserMessages.value?.size ?: -1
@@ -141,6 +144,21 @@ class ChatViewModel(
                         database.insert(newMessage)
                     }
                 })
+
+            withContext(Dispatchers.IO) {
+                val lastMessage = database.getUserMessage()!!
+                val fid: String
+                val contact: String
+                if(lastMessage.uid == uid) {
+                    fid = lastMessage.contact_fid
+                    contact = lastMessage.contact_name
+                }
+                else {
+                    fid = lastMessage.uid_fid
+                    contact = lastMessage.uid_name
+                }
+                FirebaseWebService.notifyUser(fid, contact, message)
+            }
         }
     }
 
