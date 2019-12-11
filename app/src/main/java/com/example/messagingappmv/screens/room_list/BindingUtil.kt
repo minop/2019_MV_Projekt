@@ -7,12 +7,16 @@ import com.example.messagingappmv.database.RoomContact
 @BindingAdapter("nameString")
 fun TextView.setNameString(item: RoomContact?) {
     item?.let {
-        text = item.ssid
+        if(item.ssid != null){
+            text = item.ssid
+        }
     }
 }
 @BindingAdapter("firstLetterName")
 fun TextView.setfirstLetterNameString(item: RoomContact?) {
     item?.let {
-        text = item.ssid.get(0).toString()
+        if(item.ssid != null){
+            text = item.ssid.get(0).toString()
+        }
     }
 }

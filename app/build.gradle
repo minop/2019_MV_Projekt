@@ -58,7 +58,6 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:$navigationVersion"
     
     implementation "com.google.android.material:material:$supportlibVersion"
-    implementation 'com.android.support:appcompat-v7:27.1.1'
     
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.6.2'

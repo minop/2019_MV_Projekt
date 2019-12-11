@@ -10,12 +10,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.messagingappmv.R
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.messagingappmv.MainActivity
-import com.example.messagingappmv.R
 import com.example.messagingappmv.database.RoomContactDatabase
 import com.example.messagingappmv.databinding.FragmentRoomListBinding
 import com.google.android.material.snackbar.Snackbar
@@ -32,6 +34,14 @@ class RoomListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val view =  super.onCreateView(inflater, container, savedInstanceState)
+
+        // Check if the user is logged in and redirect them if not
+        // TODO this should be moved to whichever screen becomes the home screen
+        if (TokenStorage.safeLoad(this.context!!) == null)
+            this.findNavController().navigate(R.id.action_roomListFragment_to_loginFragment)
+
+//        return view
 
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentRoomListBinding = DataBindingUtil.inflate(
@@ -106,13 +116,13 @@ class RoomListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        roomListViewModel.attemptAddCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
         start_button.setOnClickListener{
             Log.d("Message", "In Listener")
-            roomListViewModel.onSend(editRoomName.text.toString())
+            roomListViewModel.onSend(roomListViewModel.getCurrentBssid(this.context!!).toString())
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
             room_contact_list.smoothScrollToPosition(0)
-
         }
     }
 }

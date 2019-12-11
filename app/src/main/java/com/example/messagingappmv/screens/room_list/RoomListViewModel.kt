@@ -1,6 +1,7 @@
 package com.example.messagingappmv.screens.room_list
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,21 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import androidx.room.util.StringUtil
+import android.net.wifi.WifiInfo
+import android.content.Context.WIFI_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import android.net.wifi.WifiManager
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.os.Build
+import android.net.NetworkCapabilities
+import android.net.Network
+import androidx.core.content.ContextCompat.getSystemService
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomListItem
+import java.time.LocalDateTime
 
 
 /**
@@ -124,6 +140,13 @@ class RoomListViewModel(
         }
     }
 
+    private suspend fun get(ssid: String): RoomContact? {
+        return withContext(Dispatchers.IO) {
+            var roomContact = database.get(ssid)
+            roomContact
+        }
+    }
+
     private suspend fun update(roomContact: RoomContact) {
         withContext(Dispatchers.IO) {
             database.update(roomContact)
@@ -152,16 +175,92 @@ class RoomListViewModel(
         }
     }
 
+    fun isWifiConnected(context: Context): Boolean {
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT < 23) {
+                val ni = cm.activeNetworkInfo
+
+                if (ni != null) {
+                    return ni.isConnected && (ni.type == ConnectivityManager.TYPE_WIFI)
+                }
+            } else {
+                val n = cm.activeNetwork
+
+                if (n != null) {
+                    val nc = cm.getNetworkCapabilities(n)
+
+                    return nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                }
+            }
+        }
+
+        return false
+    }
+
+    fun getCurrentSsid(context: Context): String? {
+        var ssid: String? = null
+        if (isWifiConnected(context)) {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val connectionInfo = wifiManager.connectionInfo
+            if (connectionInfo != null && !connectionInfo.ssid.isBlank()) {
+                ssid = connectionInfo.ssid
+            }
+        }
+        return ssid
+    }
+    fun getCurrentBssid(context: Context): String? {
+        var bssid: String? = null
+        if (isWifiConnected(context)) {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val connectionInfo = wifiManager.connectionInfo
+            if (connectionInfo != null && !connectionInfo.bssid.isBlank()) {
+                bssid = connectionInfo.bssid
+            }
+        }
+        return bssid
+    }
+
     fun onSend(message: String) {
         uiScope.launch {
             val newRoom = RoomContact()
             newRoom.ssid = message
-            Log.d("Message", message)
             insert(newRoom)
             newRoomContact.value = getRoomContactFromDatabase()
-
-
         }
+    }
+
+    //checks if the wifi the user is currently on (if he is on any) is in the database. if it's not, add it.
+    fun attemptAddCurrentWifi(ssid: String, bssid: String, context: Context) {
+//        uiScope.launch {
+//            val localRoom = get(ssid)!!
+//            if(localRoom.room_id == 0L) {
+//                //add the room to the database
+//                if(ssid == ""){
+//                    insert(RoomContact(ssid, LocalDateTime.now().toString()))
+//                }
+//                else{
+//                    insert(RoomContact(bssid, LocalDateTime.now().toString()))
+//                }
+//                newRoomContact.value = getRoomContactFromDatabase()
+//            }
+//            if(localRoom == null) {
+//                //v lokalnej databaze sa room nenachadza. ak sa nenachadza ani na webservice tak
+//                CavojskyWebService.listRooms(context) {
+//                    if(it.isNotEmpty()){
+//                        val containsMyRoom = false
+//                        for (roomItem: RoomListItem in it) {
+//                            if((roomItem.roomid == ssid) || (roomItem.roomid == bssid)) {
+//                                //ID roomu je bud ssid alebo bssid mojej siete (btw to ze to nemame ako rozoznat, ci ide o SSID alebo BSSID znamena, ze to nie je unique identifier)
+//                                //
+//                            }
+//                            newRoomContact.value = getRoomContactFromDatabase()
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     /**
