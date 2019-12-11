@@ -3,6 +3,7 @@ package com.example.messagingappmv.webservices.firebase
 import com.example.messagingappmv.webservices.WebserviceTask
 import com.example.messagingappmv.webservices.firebase.requestbodies.MessageData
 import com.example.messagingappmv.webservices.firebase.requestbodies.MessageRequest
+import com.google.firebase.messaging.FirebaseMessaging
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -35,5 +36,9 @@ object FirebaseWebService {
         WebserviceTask<Unit>({}).execute(
             service.sendMessage(MessageRequest("/topics/$roomSSID", MessageData(sender, message)))
         )
+    }
+
+    fun subscribeToRoom(roomSSID: String) {
+        FirebaseMessaging.getInstance().subscribeToTopic(roomSSID)
     }
 }
