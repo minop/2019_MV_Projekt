@@ -34,6 +34,8 @@ interface UserMessagesDatabaseDao {
     @Insert
     fun insert(contact: UserMessages)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll( contacts: List<UserMessages>)
     /**
      * When updating a row with a value already set in a column,
      * replaces the old value with the new one.
@@ -64,8 +66,8 @@ interface UserMessagesDatabaseDao {
      *
      * sorted by start time in descending order.
      */
-    @Query("SELECT * FROM user_messages ORDER BY id DESC")
-    fun getAllUserMessages(): LiveData<List<UserMessages>>
+    @Query("SELECT * FROM user_messages WHERE (uid = :uid AND contact = :contact) OR (uid = :contact AND contact = :uid) ORDER BY id DESC")
+    fun getAllUserMessages(uid: Long, contact: Long): LiveData<List<UserMessages>>
 
     /**
      * Selects and returns the latest record.

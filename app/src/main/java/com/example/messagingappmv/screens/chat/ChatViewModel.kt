@@ -16,25 +16,34 @@ package com.example.messagingappmv.screens.chat
  * limitations under the License.
  */
 
+import android.app.Application
+import android.os.AsyncTask
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.messagingappmv.database.UserContact
 import com.example.messagingappmv.database.UserMessages
 import com.example.messagingappmv.database.UserMessagesDatabaseDao
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
+import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
 /**
- * ViewModel for SleepQualityFragment.
+ * ViewModel for ChatFragment.
  *
- * @param sleepNightKey The key of the current night we are working on.
+ * @param userContactKey The key of the current chat we are working on.
  */
 class ChatViewModel(
-    private val userContactKey: Long = 0L,
-    dataSource: UserMessagesDatabaseDao
-) : ViewModel() {
+    private val userContactKey: Long,
+    dataSource: UserMessagesDatabaseDao,
+    application: Application
 
+) : ViewModel() {
+    private val context = application.applicationContext
+    private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
 
     /** Coroutine setup variables */
@@ -43,60 +52,18 @@ class ChatViewModel(
      * viewModelJob allows us to cancel all coroutines started by this ViewModel.
      */
     private val viewModelJob = Job()
-
-//    private val newUserContact: LiveData<UserMessages>
-//
-//    fun getNewUserContact() = newUserContact
-//
-//
-//    init {
-//        newUserContact=database.getUserMessagesById(userContactKey)
-//    }
-
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    private var newUserMessages = MutableLiveData<UserMessages?>()
-
-    val allUserMessages = database.getAllUserMessages()
-
-    /**
-     * Request a toast by setting this value to true.
-     *
-     * This is private because we don't want to expose setting this value to the Fragment.
-     */
-    private var _showSnackbarEvent = MutableLiveData<Boolean?>()
-
-    /**
-     * If this is true, immediately `show()` a toast and call `doneShowingSnackbar()`.
-     */
-    val showSnackBarEvent: LiveData<Boolean?>
-        get() = _showSnackbarEvent
-
-
-    /**
-     * Call this immediately after calling `show()` on a toast.
-     *
-     * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
-     * toast.
-     */
-    fun doneShowingSnackbar() {
-        _showSnackbarEvent.value = null
-    }
-
+    private var _newUserMessages = MutableLiveData<UserMessages?>()
+    val allUserMessages = database.getAllUserMessages(uid, userContactKey)
 
     /**
      * Navigation for the Chat fragment.
      */
     private val _navigateToChat = MutableLiveData<Long>()
-    val navigateToChat
-        get() = _navigateToChat
 
     fun onUserContactClicked(id: Long) {
         _navigateToChat.value = id
-    }
-
-    fun onChatNavigated() {
-        _navigateToChat.value = null
     }
 
     init {
@@ -105,90 +72,75 @@ class ChatViewModel(
 
     private fun initializeUserContact() {
         uiScope.launch {
-            newUserMessages.value = getUserMessageFromDatabase()
+            _newUserMessages.value = getUserMessagesFromDatabase()
         }
     }
 
-    /**
-     *  Handling the case of the stopped app or forgotten recording,
-     *  the start and end times will be the same.j
-     *
-     *  If the start time and end time are not the same, then we do not have an unfinished
-     *  recording.
-     */
-    private suspend fun getUserMessageFromDatabase(): UserMessages? {
+    private suspend fun getUserMessagesFromDatabase(): UserMessages? {
+        val userMessages = mutableListOf<UserMessages>()
+
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+        Log.d("Contact Uid", userContactKey.toString())
+        var numMessages = -1
+
+        CavojskyWebService.getContactMessages(userContactKey.toString(), context, { messages ->
+            Log.d("ContactListItem", messages.toString())
+            for (item: ContactReadItem in messages) {
+                val tmpUserContact = UserMessages(
+                    item.uid.toLong(),
+                    item.contact.toLong(),
+                    item.message,
+                    item.time,
+                    item.uid_name,
+                    item.contact_name
+                )
+                userMessages.add(tmpUserContact)
+                numMessages = allUserMessages.value?.size ?: -1
+                Log.d("All messages length", numMessages.toString())
+            }
+
+            if (numMessages < userMessages.size && numMessages != -1) {
+                AsyncTask.execute {
+                    database.insertAll(
+                        userMessages.subList(
+                            numMessages,
+                            userMessages.size
+                        )
+                    )
+                }
+                Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
+
+            } else {
+                Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
+
+            }
+            Log.d("Messages", userMessages.toString())
+        })
         return withContext(Dispatchers.IO) {
 
-            var userMessage = database.getUserMessage()
-            if (userMessage?.id == userMessage?.id) {
-                userMessage = null
+            var userContact = database.getUserMessage()
+            if (userContact?.uid_name == userContact?.uid_name) {
+                userContact = null
             }
-            userMessage
-        }
-    }
-
-    private suspend fun insert(userMessage: UserMessages) {
-        withContext(Dispatchers.IO) {
-            database.insert(userMessage)
-        }
-    }
-
-    private suspend fun update(userMessage: UserMessages) {
-        withContext(Dispatchers.IO) {
-            database.update(userMessage)
-        }
-    }
-
-    private suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            database.clear()
-        }
-    }
-
-    /**
-     * Executes when the START button is clicked.
-     */
-    fun onStart() {
-        uiScope.launch {
-            // Create a new night, which captures the current time,
-            // and insert it into the database.
-            val newMessage = UserMessages()
-            newMessage.uid = 8
-
-            insert(newMessage)
-
-            newUserMessages.value = getUserMessageFromDatabase()
+            userContact
         }
     }
 
     fun onSend(message: String) {
         uiScope.launch {
             val newMessage = UserMessages()
-            newMessage.uid = 8
+            newMessage.uid = uid
             newMessage.message = message
+            newMessage.contact_id = userContactKey
 
-            Log.d("Message", message)
-            insert(newMessage)
-            newUserMessages.value = getUserMessageFromDatabase()
-
-
-
-        }
-    }
-
-    /**
-     * Executes when the CLEAR button is clicked.
-     */
-    fun onClear() {
-        uiScope.launch {
-            // Clear the database table.
-            clear()
-
-            // And clear tonight since it's no longer in the database
-            newUserMessages.value = null
-
-            // Show a snackbar message, because it's friendly.
-            _showSnackbarEvent.value = true
+            CavojskyWebService.sendMessageToContact(
+                userContactKey.toString(),
+                message,
+                context, {
+                    AsyncTask.execute {
+                        database.insert(newMessage)
+                    }
+                })
         }
     }
 

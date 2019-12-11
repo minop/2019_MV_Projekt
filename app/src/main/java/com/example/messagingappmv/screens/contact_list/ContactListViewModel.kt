@@ -12,18 +12,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import android.os.AsyncTask
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactListItem
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 
 
 /**
- * ViewModel for SleepTrackerFragment.
+ * ViewModel for ContactListFragment.
  */
 class ContactListViewModel(
     dataSource: UserContactDatabaseDao,
-    application: Application) : ViewModel() {
+    application: Application
+) : ViewModel() {
 
-
+    private val context = application.applicationContext
     /**
-     * Hold a reference to SleepDatabase via SleepDatabaseDao.
+     * Hold a reference to UserDatabase via UserContactDatabaseDao.
      */
     val database = dataSource
 
@@ -49,30 +54,6 @@ class ContactListViewModel(
     private var newUserContact = MutableLiveData<UserContact?>()
 
     val userContactList = database.getAllUserContact()
-
-    /**
-     * Request a toast by setting this value to true.
-     *
-     * This is private because we don't want to expose setting this value to the Fragment.
-     */
-    private var _showSnackbarEvent = MutableLiveData<Boolean?>()
-
-    /**
-     * If this is true, immediately `show()` a toast and call `doneShowingSnackbar()`.
-     */
-    val showSnackBarEvent: LiveData<Boolean?>
-        get() = _showSnackbarEvent
-
-
-    /**
-     * Call this immediately after calling `show()` on a toast.
-     *
-     * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
-     * toast.
-     */
-    fun doneShowingSnackbar() {
-        _showSnackbarEvent.value = null
-    }
 
 
     /**
@@ -108,6 +89,22 @@ class ContactListViewModel(
      *  recording.
      */
     private suspend fun getUserContactFromDatabase(): UserContact? {
+        val userList = mutableListOf<UserContact>()
+
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+
+        CavojskyWebService.listContacts(context, { contacts ->
+            Log.d("ContactListItem", contacts.toString())
+            for (item: ContactListItem in contacts) {
+                var tmpUserContact = UserContact()
+                tmpUserContact = UserContact(item.id.toLong(), item.name)
+                userList.add(tmpUserContact)
+            }
+            AsyncTask.execute { database.insertAll(userList) }
+
+            Log.d("ContactListItem", userList.toString())
+        })
+
         return withContext(Dispatchers.IO) {
 
             var userContact = database.getUserContact()
@@ -115,68 +112,6 @@ class ContactListViewModel(
                 userContact = null
             }
             userContact
-        }
-    }
-
-    private suspend fun insert(userContact: UserContact) {
-        withContext(Dispatchers.IO) {
-            database.insert(userContact)
-        }
-    }
-
-    private suspend fun update(userContact: UserContact) {
-        withContext(Dispatchers.IO) {
-            database.update(userContact)
-        }
-    }
-
-    private suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            database.clear()
-        }
-    }
-
-    /**
-     * Executes when the START button is clicked.
-     */
-    fun onStart() {
-        uiScope.launch {
-            // Create a new night, which captures the current time,
-            // and insert it into the database.
-            val newNight = UserContact()
-            newNight.user_name = "test"
-
-            insert(newNight)
-
-            newUserContact.value = getUserContactFromDatabase()
-        }
-    }
-
-    fun onSend(message: String) {
-        uiScope.launch {
-            val newNight = UserContact()
-            newNight.user_name = message
-            Log.d("Message", message)
-            insert(newNight)
-            newUserContact.value = getUserContactFromDatabase()
-
-
-        }
-    }
-
-    /**
-     * Executes when the CLEAR button is clicked.
-     */
-    fun onClear() {
-        uiScope.launch {
-            // Clear the database table.
-            clear()
-
-            // And clear tonight since it's no longer in the database
-            newUserContact.value = null
-
-            // Show a snackbar message, because it's friendly.
-            _showSnackbarEvent.value = true
         }
     }
 
