@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object FirebaseWebService {
 
-    private const val BASE_URL = "https://fcm.googleapis.com/fcm/send"
+    private const val BASE_URL = "https://fcm.googleapis.com/fcm/send/"
     private val service: FirebaseWebServiceInterface
 
     init {
