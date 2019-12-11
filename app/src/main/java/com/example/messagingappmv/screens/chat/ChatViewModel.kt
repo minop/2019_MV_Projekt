@@ -29,6 +29,7 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
+import com.example.messagingappmv.webservices.firebase.FirebaseEventListener
 import com.example.messagingappmv.webservices.firebase.FirebaseEventManager
 import com.example.messagingappmv.webservices.firebase.FirebaseWebService
 import kotlinx.android.synthetic.main.fragment_chat.*
@@ -44,7 +45,7 @@ class ChatViewModel(
     dataSource: UserMessagesDatabaseDao,
     application: Application
 
-) : ViewModel() {
+) : ViewModel(), FirebaseEventListener {
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
@@ -76,11 +77,7 @@ class ChatViewModel(
     init {
         initializeUserContact()
 
-        FirebaseEventManager.subscribe { uid_fid ->
-            uiScope.launch {
-                getUserMessagesFromDatabase()
-            }
-        }
+        FirebaseEventManager.addListener(this)
     }
 
     private fun initializeUserContact() {
@@ -148,6 +145,13 @@ class ChatViewModel(
                 userContact = null
             }
             userContact
+        }
+    }
+
+    override fun onFirebaseEvent(senderUID: Long) {
+        uiScope.launch {
+            if(senderUID == userContactKey)
+                getUserMessagesFromDatabase()
         }
     }
 
