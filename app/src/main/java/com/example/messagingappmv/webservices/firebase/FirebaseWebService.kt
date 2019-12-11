@@ -1,7 +1,8 @@
 package com.example.messagingappmv.webservices.firebase
 
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
+import com.example.messagingappmv.webservices.WebserviceTask
+import com.example.messagingappmv.webservices.firebase.requestbodies.MessageData
+import com.example.messagingappmv.webservices.firebase.requestbodies.MessageRequest
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,12 +25,15 @@ object FirebaseWebService {
         service = retrofit.create(FirebaseWebServiceInterface::class.java)
     }
 
-    fun notifyUser(recieverFID: String) {
-        FirebaseMessaging.getInstance().send(
-            RemoteMessage.Builder("eBvxkWv0K8I:APA91bEvolDMa9_nIfx3eEgU_6zpGmq2rfNAcV9ZHcTG_5YCnDNyO9aqlhnY4APu-wI1kMN0lagmFwqRAJOUxS5MRTjMqdDDO2MQ-DuhyPIdP7SCX9XfafR0JjxHmuiMBM1DEMK5zwba" + "@gcm.googleapis.com")
-                .setMessageId("msgID")
-                .addData("key", "value")
-                .build()
+    fun notifyUser(recieverFID: String, sender: String, message: String) {
+        WebserviceTask<Unit>({}).execute(
+            service.sendMessage(MessageRequest(recieverFID, MessageData(sender, message)))
+        )
+    }
+
+    fun notifyRoom(roomSSID: String, sender: String, message: String) {
+        WebserviceTask<Unit>({}).execute(
+            service.sendMessage(MessageRequest("/topics/$roomSSID", MessageData(sender, message)))
         )
     }
 }
