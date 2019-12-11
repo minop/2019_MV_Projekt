@@ -2,15 +2,26 @@ package com.example.messagingappmv.webservices.firebase
 
 object FirebaseEventManager {
 
-    private val listeners = ArrayList<FirebaseEventListener?>()
+    private val dmListeners = ArrayList<FirebaseDMEventListener>()
 
-    fun addListener(listener: FirebaseEventListener) {
-        listeners.add(listener)
+    fun addDMListener(listener: FirebaseDMEventListener) {
+        dmListeners.add(listener)
     }
 
-    fun publishEvent(uid: Long) {
-        listeners.forEach {listener ->
-            listener?.onFirebaseEvent(uid)
+    fun removeDMListener(listener: FirebaseDMEventListener) {
+        val iterator = dmListeners.iterator()
+        while (iterator.hasNext()) {
+            val it = iterator.next()
+            if(it == listener) {
+                iterator.remove()
+                break
+            }
+        }
+    }
+
+    fun publishDMEvent(uid: Long) {
+        dmListeners.forEach { listener ->
+            listener.onFirebaseDMEvent(uid)
         }
     }
 }

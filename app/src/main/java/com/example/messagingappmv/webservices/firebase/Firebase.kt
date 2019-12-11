@@ -14,7 +14,7 @@ class Firebase : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         if(message.data.isNotEmpty()) {
             if(message.data.get("type").equals(FirebaseWebService.TYPE_USER)) {
-                FirebaseEventManager.publishEvent(message.data.get("identifier")!!.toLong())
+                FirebaseEventManager.publishDMEvent(message.data.get("identifier")!!.toLong())
             }
         }
     }

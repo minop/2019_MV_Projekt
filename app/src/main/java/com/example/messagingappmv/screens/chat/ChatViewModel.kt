@@ -17,11 +17,9 @@ package com.example.messagingappmv.screens.chat
  */
 
 import android.app.Application
-import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.messagingappmv.database.UserMessages
@@ -29,10 +27,9 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
-import com.example.messagingappmv.webservices.firebase.FirebaseEventListener
+import com.example.messagingappmv.webservices.firebase.FirebaseDMEventListener
 import com.example.messagingappmv.webservices.firebase.FirebaseEventManager
 import com.example.messagingappmv.webservices.firebase.FirebaseWebService
-import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
 /**
@@ -45,7 +42,7 @@ class ChatViewModel(
     dataSource: UserMessagesDatabaseDao,
     application: Application
 
-) : ViewModel(), FirebaseEventListener {
+) : ViewModel(), FirebaseDMEventListener {
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
@@ -77,7 +74,7 @@ class ChatViewModel(
     init {
         initializeUserContact()
 
-        FirebaseEventManager.addListener(this)
+        FirebaseEventManager.addDMListener(this)
     }
 
     private fun initializeUserContact() {
@@ -148,7 +145,7 @@ class ChatViewModel(
         }
     }
 
-    override fun onFirebaseEvent(senderUID: Long) {
+    override fun onFirebaseDMEvent(senderUID: Long) {
         uiScope.launch {
             if(senderUID == userContactKey)
                 getUserMessagesFromDatabase()
@@ -184,5 +181,6 @@ class ChatViewModel(
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+        FirebaseEventManager.removeDMListener(this)
     }
 }
