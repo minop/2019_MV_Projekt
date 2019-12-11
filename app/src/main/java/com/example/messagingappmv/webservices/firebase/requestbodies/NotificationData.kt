@@ -1,3 +1,3 @@
 package com.example.messagingappmv.webservices.firebase.requestbodies
 
-class MessageData(val type: String, val identifier: String)
+class NotificationData(val title: String, val body: String)
