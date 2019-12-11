@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.messagingappmv.R
 import com.example.messagingappmv.databinding.FragmentLoginBinding
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 
 class LoginFragment : Fragment() {
 
@@ -22,6 +23,10 @@ class LoginFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         binding.loginViewModel = viewModel
         binding.lifecycleOwner = this
+
+        // dirty but effective
+        if (TokenStorage.safeLoad(this.context!!) != null)
+            TokenStorage.delete(this.context!!)
 
         binding.buttonLogin.setOnClickListener {
             viewModel.login(this.context!!, this.findNavController())
