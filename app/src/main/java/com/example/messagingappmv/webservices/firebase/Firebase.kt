@@ -2,6 +2,7 @@ package com.example.messagingappmv.webservices.firebase
 
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
+import com.example.messagingappmv.webservices.firebase.events.FirebaseEventManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 

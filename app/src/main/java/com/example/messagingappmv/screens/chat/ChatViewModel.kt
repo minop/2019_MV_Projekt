@@ -27,8 +27,8 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
-import com.example.messagingappmv.webservices.firebase.FirebaseDMEventListener
-import com.example.messagingappmv.webservices.firebase.FirebaseEventManager
+import com.example.messagingappmv.webservices.firebase.events.FirebaseDMEventListener
+import com.example.messagingappmv.webservices.firebase.events.FirebaseEventManager
 import com.example.messagingappmv.webservices.firebase.FirebaseWebService
 import kotlinx.coroutines.*
 
@@ -42,7 +42,8 @@ class ChatViewModel(
     dataSource: UserMessagesDatabaseDao,
     application: Application
 
-) : ViewModel(), FirebaseDMEventListener {
+) : ViewModel(),
+    FirebaseDMEventListener {
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
