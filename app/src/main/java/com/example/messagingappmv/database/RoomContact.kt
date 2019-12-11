@@ -15,18 +15,13 @@ data class RoomContact(
     var room_id: Long = 0L,
 
     @ColumnInfo(name = "ssid")
-    var ssid: String = "",
-
-    @ColumnInfo(name = "time")
-    var time: String = ""
+    var ssid: String = ""
 ){
     constructor(roomResponse: RoomListItem) : this(){
         this.ssid = roomResponse.roomid
-        this.time = roomResponse.time
     }
 
-    constructor(ssid: String, time: String) : this(){
+    constructor(ssid: String) : this(){
         this.ssid = ssid
-        this.time = time
     }
 }

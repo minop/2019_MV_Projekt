@@ -15,15 +15,9 @@ data class UserPosts(
     @ColumnInfo(name = "uid")
     var uid: Long = 0L,
 
-    @ColumnInfo(name = "ssid")
-    var room_ssid: String = "",
+    @ColumnInfo(name = "room_id")
+    var room_id: String = "",
 
-    @ColumnInfo(name = "bssid")
-    var room_bssid: String = "",
-
-    @ColumnInfo(name = "message")
-    var message: String = "",
-
-    @ColumnInfo(name = "time")
-    var time: String = ""
+    @ColumnInfo(name = "post")
+    var post: String = ""
 )

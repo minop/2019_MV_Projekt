@@ -51,7 +51,7 @@ class RoomListFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.title = getString(R.string.room_list_title)
 
         // Create an instance of the ViewModel Factory.
-        val dataSource = RoomContactDatabase.getInstance(application).RoomContactDatabaseDao
+        val dataSource = RoomContactDatabase.getInstance(application).roomContactDatabaseDao
         val viewModelFactory = RoomListViewModelFactory(dataSource, application)
 
         // Get a reference to the ViewModel associated with this fragment.

@@ -233,18 +233,18 @@ class RoomListViewModel(
 
     //checks if the wifi the user is currently on (if he is on any) is in the database. if it's not, add it.
     fun attemptAddCurrentWifi(ssid: String, bssid: String, context: Context) {
-//        uiScope.launch {
-//            val localRoom = get(ssid)!!
-//            if(localRoom.room_id == 0L) {
-//                //add the room to the database
-//                if(ssid == ""){
-//                    insert(RoomContact(ssid, LocalDateTime.now().toString()))
-//                }
-//                else{
-//                    insert(RoomContact(bssid, LocalDateTime.now().toString()))
-//                }
-//                newRoomContact.value = getRoomContactFromDatabase()
-//            }
+        uiScope.launch {
+            val localRoom = get(ssid)
+            if(localRoom == null) {
+                //add the room to the database
+                if(ssid == ""){
+                    insert(RoomContact(bssid))
+                }
+                else{
+                    insert(RoomContact(ssid))
+                }
+                newRoomContact.value = getRoomContactFromDatabase()
+            }
 //            if(localRoom == null) {
 //                //v lokalnej databaze sa room nenachadza. ak sa nenachadza ani na webservice tak
 //                CavojskyWebService.listRooms(context) {
@@ -260,7 +260,7 @@ class RoomListViewModel(
 //                    }
 //                }
 //            }
-//        }
+        }
     }
 
     /**

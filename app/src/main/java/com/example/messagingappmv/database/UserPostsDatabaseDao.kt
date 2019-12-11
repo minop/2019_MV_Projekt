@@ -71,7 +71,7 @@ interface UserPostsDatabaseDao {
      * Selects and returns the latest record.
      */
     @Query("SELECT * FROM user_posts ORDER BY id DESC LIMIT 1")
-    fun getUserPosts(): UserPosts?
+    fun getUserPost(): UserPosts?
 
     /**
      * Selects and returns the night with given Id.

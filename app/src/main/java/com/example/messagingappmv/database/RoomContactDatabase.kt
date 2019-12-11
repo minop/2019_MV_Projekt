@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 @Database(entities = [RoomContact::class, UserPosts::class], version = 2, exportSchema = false)
 abstract class RoomContactDatabase : RoomDatabase() {
 
-    abstract val RoomContactDatabaseDao: RoomContactDatabaseDao
+    abstract val roomContactDatabaseDao: RoomContactDatabaseDao
     abstract val userPostsDatabaseDao: UserPostsDatabaseDao
 
     companion object {
