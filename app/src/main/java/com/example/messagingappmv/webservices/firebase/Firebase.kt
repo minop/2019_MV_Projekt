@@ -17,6 +17,9 @@ class Firebase : FirebaseMessagingService() {
             if(message.data.get("type").equals(FirebaseWebService.TYPE_USER)) {
                 FirebaseEventManager.publishDMEvent(message.data.get("identifier")!!.toLong())
             }
+            else if(message.data.get("type").equals(FirebaseWebService.TYPE_ROOM)) {
+                FirebaseEventManager.publishRoomEvent(message.data.get("identifier")!!)
+            }
         }
     }
 }
