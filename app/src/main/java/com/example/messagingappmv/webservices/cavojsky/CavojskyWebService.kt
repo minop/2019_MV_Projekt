@@ -63,7 +63,9 @@ object CavojskyWebService {
         throw makeException(response.errorBody()?.string()!!)
     }
 
-    // TODO firebase
+    fun updateFirebaseToken(firebaseToken: String, context: Context) {
+        WebserviceTask<Unit>({}).execute(this.create(context).setFirebaseId(UserFirebaseRequest(TokenStorage.load(context).uid, firebaseToken)))
+    }
 
     fun listRooms(context: Context, callback: (List<RoomListItem>) -> Unit, callbackError: () -> Unit = {}) {
         WebserviceTask<List<RoomListItem>>({ response ->
