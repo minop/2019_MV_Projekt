@@ -93,7 +93,7 @@ class ContactListViewModel(
 
         Log.d("Uid Login user", TokenStorage.load(context).uid)
 
-        CavojskyWebService.listContacts(context) { contacts ->
+        CavojskyWebService.listContacts(context, { contacts ->
             Log.d("ContactListItem", contacts.toString())
             for (item: ContactListItem in contacts) {
                 var tmpUserContact = UserContact()
@@ -103,7 +103,7 @@ class ContactListViewModel(
             AsyncTask.execute { database.insertAll(userList) }
 
             Log.d("ContactListItem", userList.toString())
-        }
+        })
 
         return withContext(Dispatchers.IO) {
 

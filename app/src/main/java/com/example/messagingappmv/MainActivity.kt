@@ -23,11 +23,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_main)
-        CavojskyWebService.login("frantisek.ff@gmail.com", "heslo123", applicationContext )
-//        TokenStorage.load(context = applicationContext).accessToken
-
-
 
         val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         drawerLayout = binding.drawerLayout

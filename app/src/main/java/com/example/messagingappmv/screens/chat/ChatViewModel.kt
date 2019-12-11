@@ -83,7 +83,7 @@ class ChatViewModel(
         Log.d("Contact Uid", userContactKey.toString())
         var numMessages = -1
 
-        CavojskyWebService.getContactMessages(userContactKey.toString(), context) { messages ->
+        CavojskyWebService.getContactMessages(userContactKey.toString(), context, { messages ->
             Log.d("ContactListItem", messages.toString())
             for (item: ContactReadItem in messages) {
                 val tmpUserContact = UserMessages(
@@ -115,7 +115,7 @@ class ChatViewModel(
 
             }
             Log.d("Messages", userMessages.toString())
-        }
+        } )
         return withContext(Dispatchers.IO) {
 
             var userContact = database.getUserMessage()
