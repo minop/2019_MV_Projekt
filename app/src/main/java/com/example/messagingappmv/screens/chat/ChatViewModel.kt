@@ -89,7 +89,7 @@ class ChatViewModel(
     }
 
     companion object {
-        private suspend fun getUserMessagesFromDatabase(userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao, fillMetadataCallback : (ContactReadItem) -> Unit = {}): UserMessages? {
+        suspend fun getUserMessagesFromDatabase(userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao, fillMetadataCallback : (ContactReadItem) -> Unit = {}): UserMessages? {
             val userMessages = mutableListOf<UserMessages>()
 
             Log.d("Uid Login user", TokenStorage.load(context).uid)

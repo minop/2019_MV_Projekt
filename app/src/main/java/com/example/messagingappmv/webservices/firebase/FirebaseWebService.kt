@@ -20,8 +20,8 @@ object FirebaseWebService {
     private const val BASE_URL = "https://fcm.googleapis.com"
     private val service: FirebaseWebServiceInterface
 
-    private const val TYPE_USER = "user"
-    private const val TYPE_ROOM = "room"
+    const val TYPE_USER = "user"
+    const val TYPE_ROOM = "room"
 
     private val cleansingRegex = Regex("[^a-zA-Z0-9-_.~%]")
 
