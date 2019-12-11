@@ -29,7 +29,9 @@ import com.example.messagingappmv.database.UserMessagesDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
+import com.example.messagingappmv.webservices.firebase.FirebaseEventManager
 import com.example.messagingappmv.webservices.firebase.FirebaseWebService
+import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
 /**
@@ -46,6 +48,7 @@ class ChatViewModel(
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
+
 
     private lateinit var contactFID: String
     private lateinit var myUsername: String
@@ -76,7 +79,12 @@ class ChatViewModel(
 
     private fun initializeUserContact() {
         uiScope.launch {
-            _newUserMessages.value = getUserMessagesFromDatabase(userContactKey, context, allUserMessages, database) { message ->
+            _newUserMessages.value = getUserMessagesFromDatabase(
+                userContactKey,
+                context,
+                allUserMessages,
+                database
+            ) { message ->
                 if (message.uid == uid.toString()) {
                     contactFID = message.contact_fid
                     myUsername = message.uid_name
@@ -86,61 +94,74 @@ class ChatViewModel(
                 }
             }
         }
+
+        FirebaseEventManager.subscribe { uid_fid ->
+            uiScope.launch {
+                withContext(Dispatchers.IO) {
+                    getUserMessagesFromDatabase(
+                        userContactKey,
+                        context,
+                        allUserMessages,
+                        database
+                    )
+                }
+            }
+        }
     }
 
-    companion object {
-        suspend fun getUserMessagesFromDatabase(userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao, fillMetadataCallback : (ContactReadItem) -> Unit = {}): UserMessages? {
-            val userMessages = mutableListOf<UserMessages>()
+    suspend fun getUserMessagesFromDatabase(
+        userContactKey: Long,
+        context: Context,
+        allUserMessages: LiveData<List<UserMessages>>,
+        database: UserMessagesDatabaseDao,
+        fillMetadataCallback: (ContactReadItem) -> Unit = {}
+    ): UserMessages? {
+        val userMessages = mutableListOf<UserMessages>()
 
-            Log.d("Uid Login user", TokenStorage.load(context).uid)
-            Log.d("Contact Uid", userContactKey.toString())
-            var numMessages = -1
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+        Log.d("Contact Uid", userContactKey.toString())
+        var numMessages = -1
 
-            CavojskyWebService.getContactMessages(userContactKey.toString(), context, { messages ->
-                Log.d("ContactListItem", messages.toString())
-                for (item: ContactReadItem in messages) {
-                    val tmpUserContact = UserMessages(
-                        item.uid.toLong(),
-                        item.contact.toLong(),
-                        item.message,
-                        item.time,
-                        item.uid_name,
-                        item.contact_name,
-                        item.uid_fid,
-                        item.contact_fid
-                    )
-                    userMessages.add(tmpUserContact)
-                    numMessages = allUserMessages.value?.size ?: -1
-                    Log.d("All messages length", numMessages.toString())
-                }
-
-                if (numMessages < userMessages.size && numMessages != -1) {
-                    AsyncTask.execute {
-                        database.insertAll(
-                            userMessages.subList(
-                                numMessages,
-                                userMessages.size
-                            )
-                        )
-                    }
-                    Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
-
-                } else {
-                    Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
-
-                }
-                Log.d("Messages", userMessages.toString())
-
-                fillMetadataCallback.invoke(messages.last())
-            })
-            return withContext(Dispatchers.IO) {
-
-                var userContact = database.getUserMessage()
-                if (userContact?.uid_name == userContact?.uid_name) {
-                    userContact = null
-                }
-                userContact
+        CavojskyWebService.getContactMessages(userContactKey.toString(), context, { messages ->
+            Log.d("ContactListItem", messages.toString())
+            for (item: ContactReadItem in messages) {
+                val tmpUserContact = UserMessages(
+                    item.uid.toLong(),
+                    item.contact.toLong(),
+                    item.message,
+                    item.time,
+                    item.uid_name,
+                    item.contact_name
+                )
+                userMessages.add(tmpUserContact)
+                numMessages = allUserMessages.value?.size ?: -1
+                Log.d("All messages length", numMessages.toString())
             }
+
+            if (numMessages < userMessages.size && numMessages != -1) {
+                AsyncTask.execute {
+                    database.insertAll(
+                        userMessages.subList(
+                            numMessages,
+                            userMessages.size
+                        )
+                    )
+                }
+                Toast.makeText(context, "New Messages", Toast.LENGTH_LONG).show()
+
+            } else {
+                Toast.makeText(context, "Nothing new", Toast.LENGTH_LONG).show()
+
+            }
+            Log.d("Messages", userMessages.toString())
+        })
+        return withContext(Dispatchers.IO) {
+
+            var userContact = database.getUserMessage()
+            if (userContact?.uid_name == userContact?.uid_name) {
+                userContact = null
+            }
+            userContact
         }
     }
 
@@ -159,8 +180,8 @@ class ChatViewModel(
                         database.insert(newMessage)
                     }
                 })
-
             FirebaseWebService.notifyUser(contactFID, uid.toString(), myUsername, message)
+
         }
     }
 
