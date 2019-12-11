@@ -36,18 +36,20 @@ object CavojskyWebService {
     }
 
     // webservice operations
-    fun register(username: String, password: String, context: Context) {
-        WebserviceTask<RegistrationResponse> { response ->
-            TokenStorage.save(LoginData(response.uid, response.access, response.refresh), context)
-        }.execute(
+    fun register(username: String, password: String, context: Context, callback: () -> Unit = {}, callbackError: () -> Unit = {}) {
+        WebserviceTask<RegistrationResponse>({ response ->
+            TokenStorage.save(LoginData(response!!.uid, response.access, response.refresh), context)
+            callback.invoke()
+        }, callbackError).execute(
             this.create(context).register(RegistrationRequest(username, password))
         )
     }
 
-    fun login(username: String, password: String, context: Context) {
-        WebserviceTask<LoginResponse> { response ->
-            TokenStorage.save(LoginData(response.uid, response.access, response.refresh), context)
-        }.execute(
+    fun login(username: String, password: String, context: Context, callback: () -> Unit = {}, callbackError: () -> Unit = {}) {
+        WebserviceTask<LoginResponse>({ response ->
+            TokenStorage.save(LoginData(response!!.uid, response.access, response.refresh), context)
+            callback.invoke()
+        }, callbackError).execute(
             this.create(context).login(LoginRequest(username, password))
         )
     }
@@ -63,38 +65,50 @@ object CavojskyWebService {
 
     // TODO firebase
 
-    fun listRooms(context: Context, callback: (List<RoomListItem>) -> Any) {
-        WebserviceTask(callback).execute(
+    fun listRooms(context: Context, callback: (List<RoomListItem>) -> Unit, callbackError: () -> Unit = {}) {
+        WebserviceTask<List<RoomListItem>>({ response ->
+            callback.invoke(response!!)
+        }, callbackError).execute(
             this.create(context).getRooms(RoomListRequest( TokenStorage.load(context).uid ))
         )
     }
 
-    fun sendMessageToRoom(room: String, message: String, context: Context) {
-        WebserviceTask<Void> {}.execute(
+    fun sendMessageToRoom(room: String, message: String, context: Context, callback: () -> Unit = {}, callbackError: () -> Unit = {}) {
+        WebserviceTask<Unit>({
+            callback.invoke()
+        }, callbackError).execute(
             this.create(context).sendMessageToRoom(RoomMessageRequest(TokenStorage.load(context).uid, room, message))
         )
     }
 
-    fun getRoomMessages(room: String, context: Context, callback: (List<RoomReadItem>) -> Any) {
-        WebserviceTask(callback).execute(
+    fun getRoomMessages(room: String, context: Context, callback: (List<RoomReadItem>) -> Unit, callbackError: () -> Unit = {}) {
+        WebserviceTask<List<RoomReadItem>>({ response ->
+            callback.invoke(response!!)
+        }, callbackError).execute(
             this.create(context).getRoomMessages(RoomReadRequest(TokenStorage.load(context).uid, room))
         )
     }
 
-    fun listContacts(context: Context, callback: (List<ContactListItem>) -> Any) {
-        WebserviceTask(callback).execute(
+    fun listContacts(context: Context, callback: (List<ContactListItem>) -> Unit, callbackError: () -> Unit = {}) {
+        WebserviceTask<List<ContactListItem>>({ response ->
+            callback.invoke(response!!)
+        }, callbackError).execute(
             this.create(context).getContacts(ContactListRequest( TokenStorage.load(context).uid ))
         )
     }
 
-    fun sendMessageToContact(contact: String, message: String, context: Context) {
-        WebserviceTask<Void> {}.execute(
+    fun sendMessageToContact(contact: String, message: String, context: Context, callback: () -> Unit = {}, callbackError: () -> Unit = {}) {
+        WebserviceTask<Unit>({
+            callback.invoke()
+        }, callbackError).execute(
             this.create(context).sendMessageToContact(ContactMessageRequest(TokenStorage.load(context).uid, contact, message))
         )
     }
 
-    fun getContactMessages(contact: String, context: Context, callback: (List<ContactReadItem>) -> Any) {
-        WebserviceTask(callback).execute(
+    fun getContactMessages(contact: String, context: Context, callback: (List<ContactReadItem>) -> Unit, callbackError: () -> Unit = {}) {
+        WebserviceTask<List<ContactReadItem>>({ response ->
+            callback.invoke(response!!)
+        }, callbackError).execute(
             this.create(context).getContactMessages(ContactReadRequest(TokenStorage.load(context).uid, contact))
         )
     }

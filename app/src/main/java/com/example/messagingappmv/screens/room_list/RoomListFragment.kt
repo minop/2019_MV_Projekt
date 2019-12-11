@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.messagingappmv.R
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 
 class RoomListFragment : Fragment() {
     override fun onCreateView(
@@ -12,6 +15,13 @@ class RoomListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+        val view =  super.onCreateView(inflater, container, savedInstanceState)
+
+        // Check if the user is logged in and redirect them if not
+        // TODO this should be moved to whichever screen becomes the home screen
+        if (TokenStorage.safeLoad(this.context!!) == null)
+            this.findNavController().navigate(R.id.action_roomListFragment_to_loginFragment)
+
+        return view
     }
 }
