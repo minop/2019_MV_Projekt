@@ -16,72 +16,82 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RoomAdapter(val clickListener: RoomListener) :
+class RoomAdapter(    
+    private val uid: Long,
+    private val contactUid: Long,
+    val clickListener: RoomListener
+) :
     ListAdapter<DataItem, RecyclerView.ViewHolder>(RoomDiffCallback()) {
-    private val ITEM_VIEW_TYPE_HEADER = 0
-    private val ITEM_VIEW_TYPE_ITEM = 1
+    private val ITEM_VIEW_TYPE_TEXT_CONTACT = 0
+    private val ITEM_VIEW_TYPE_TEXT_USER = 1
+    private val ITEM_VIEW_TYPE_IMAGE_CONTACT = 2
+    private val ITEM_VIEW_TYPE_IMAGE_USER = 3
+    
     private val adapterScope = CoroutineScope(Dispatchers.Default)
-
-
+    
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ViewHolder -> {
-                val nightItem = getItem(position) as DataItem.UserPost
-                holder.bind(nightItem.userPost, clickListener)
+            is ViewHolderTextUser -> {
+                val userPostItem = getItem(position) as DataItem.UserPost
+                holder.bind(userPostItem.userPost, clickListener)
             }
-            is ViewHolder2 -> {
-                val nightItem = getItem(position) as DataItem.UserPost
-                holder.bind(nightItem.userPost, clickListener)
+            is ViewHolderTextContact -> {
+                val userPostItem = getItem(position) as DataItem.UserPost
+                holder.bind(userPostItem.userPost, clickListener)
+            }
+            is ViewHolderImgContact -> {
+                val userPostItem = getItem(position) as DataItem.UserPost
+                holder.bind(userPostItem.userPost)
+            }
+            is ViewHolderImgUser -> {
+                val userPostItem = getItem(position) as DataItem.UserPost
+                holder.bind(userPostItem.userPost)
             }
         }
-//        holder.bind(getItem(position)!!, clickListener)
-//        val current_message = getItem(position!!)
-//        if(current_message.uid == 1L){
-//            holder.itemView.user_name_string.setBackgroundColor(Color.parseColor("#000000"))
-//        }
-//        holder.itemView.user_name_string.setBackgroundColor(Color.parseColor("#000000"))
-//        holder.itemView.user_name_string.setBackgroundColor(R.drawable.oval_for_one_message)
-
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_VIEW_TYPE_HEADER -> ViewHolder2.from(parent)
-            ITEM_VIEW_TYPE_ITEM -> ViewHolder.from(parent)
+            ITEM_VIEW_TYPE_TEXT_CONTACT -> ViewHolderTextContact.from(parent)
+            ITEM_VIEW_TYPE_TEXT_USER -> ViewHolderTextUser.from(parent)
+            ITEM_VIEW_TYPE_IMAGE_CONTACT -> ViewHolderImgUser.from(parent)
+            ITEM_VIEW_TYPE_IMAGE_USER -> ViewHolderImgContact.from(parent)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
     }
 
     fun addHeaderAndSubmitList(list: List<UserPosts>?) {
         adapterScope.launch {
-//            val items = when (list) {
-//                null -> listOf(DataItem.ContactMessage)
-//                else -> listOf(DataItem.ContactMessage) + list.map { DataItem.UserPost(it) }
-//            }
             val items = list?.map { DataItem.UserPost(it) }
-
-
             withContext(Dispatchers.Main) {
                 submitList(items)
             }
         }
     }
-
-
+    
     override fun getItemViewType(position: Int): Int {
-//        return when (getItem(position)) {
-//            is DataItem.ContactMessage -> ITEM_VIEW_TYPE_HEADER
-//            is DataItem.UserPost -> ITEM_VIEW_TYPE_ITEM
-//        }
-        if(getItem(position).uid == 8L){
-            return ITEM_VIEW_TYPE_ITEM
-        } else {
-            return ITEM_VIEW_TYPE_HEADER
-        }
+        val post = getItem(position).post
+        if (post != "") {
+            if (post.length >= 5) {
+                if (post.substring(0, 4) == "gif:") {
+                    return if (getItem(position).uid == uid) {
+                        ITEM_VIEW_TYPE_IMAGE_USER
+                    } else {
+                        ITEM_VIEW_TYPE_IMAGE_CONTACT
+                    }
+                }
+            }
+            return if (getItem(position).uid == uid) {
+                ITEM_VIEW_TYPE_TEXT_USER
+            } else {
+                ITEM_VIEW_TYPE_TEXT_CONTACT
+            }
+
+        } else return -1
     }
 
-    class ViewHolder private constructor(val binding: ListItemRoomUserBinding) :
+    class ViewHolderTextUser private constructor(val binding: ListItemRoomUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: UserPosts, clickListener: RoomListener) {
@@ -92,15 +102,15 @@ class RoomAdapter(val clickListener: RoomListener) :
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup): ViewHolderTextUser {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemRoomUserBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
+                return ViewHolderTextUser(binding)
             }
         }
     }
 
-    class ViewHolder2 private constructor(val binding: ListItemRoomUsersContactBinding) :
+    class ViewHolderTextContact private constructor(val binding: ListItemRoomUsersContactBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: UserPosts, clickListener: RoomListener) {
@@ -111,25 +121,49 @@ class RoomAdapter(val clickListener: RoomListener) :
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder2 {
+            fun from(parent: ViewGroup): ViewHolderTextContact {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemRoomUsersContactBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder2(binding)
+                return ViewHolderTextContact(binding)
             }
         }
     }
 
-//    class TextViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-//        companion object {
-//            fun from(parent: ViewGroup): TextViewHolder {
-//                val layoutInflater = LayoutInflater.from(parent.context)
-//                val view = layoutInflater.inflate(R.layout.list_item_chat_contact, parent, false)
-//                return TextViewHolder(view)
-//            }
-//        }
-//    }
-}
+    class ViewHolderImgContact private constructor(val binding: ImageItemRoomContactBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
+        fun bind(item: UserPosts) {
+            binding.room = item
+            binding.executePendingBindings()
+
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolderImgContact {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ImageItemRoomContactBinding.inflate(layoutInflater, parent, false)
+                return ViewHolderImgContact(binding)
+            }
+        }
+    }
+
+    class ViewHolderImgUser private constructor(val binding: ImageItemRoomUserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: UserPosts) {
+            binding.room = item
+            binding.executePendingBindings()
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolderImgUser {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ImageItemRoomUserBinding.inflate(layoutInflater, parent, false)
+                return ViewHolderImgUser(binding)
+            }
+        }
+    }
+}
 
 class RoomDiffCallback : DiffUtil.ItemCallback<DataItem>() {
 
@@ -151,15 +185,18 @@ class RoomListener(val clickListener: (userId: Long) -> Unit) {
 sealed class DataItem {
     abstract val id: Long
     abstract val uid: Long
+    abstract val post: String
 
     data class UserPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
+        override val post = userPost.post
     }
 
-    data class ContactMessage(val userPost: UserPosts): DataItem() {
+    data class ContactPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
+        override val post = userPost.post
     }
 }
 
