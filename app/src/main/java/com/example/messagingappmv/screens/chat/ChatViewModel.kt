@@ -17,11 +17,9 @@ package com.example.messagingappmv.screens.chat
  */
 
 import android.app.Application
-import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.messagingappmv.database.UserMessages
@@ -30,7 +28,6 @@ import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.ContactReadItem
 import com.example.messagingappmv.webservices.firebase.FirebaseWebService
-import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.coroutines.*
 
 /**
@@ -47,6 +44,9 @@ class ChatViewModel(
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
+
+    private lateinit var contactFID: String
+    private lateinit var myUsername: String
 
     /** Coroutine setup variables */
 
@@ -73,13 +73,26 @@ class ChatViewModel(
     }
 
     private fun initializeUserContact() {
+        val async = uiScope.async {
+            _newUserMessages.value = getUserMessagesFromDatabase(/*userContactKey, context, allUserMessages, database*/)
+        }
         uiScope.launch {
-            _newUserMessages.value = getUserMessagesFromDatabase(userContactKey, context, allUserMessages, database)
+            async.await()
+            withContext(Dispatchers.IO) {
+                val lastMessage = database.getUserMessage()!!
+                if (lastMessage.uid == uid) {
+                    contactFID = lastMessage.contact_fid
+                    myUsername = lastMessage.uid_name
+                } else {
+                    contactFID = lastMessage.uid_fid
+                    myUsername = lastMessage.contact_name
+                }
+            }
         }
     }
 
-    companion object {
-        private suspend fun getUserMessagesFromDatabase(userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao): UserMessages? {
+//    companion object {
+        private suspend fun getUserMessagesFromDatabase(/*userContactKey: Long, context: Context, allUserMessages: LiveData<List<UserMessages>>, database: UserMessagesDatabaseDao*/): UserMessages? {
             val userMessages = mutableListOf<UserMessages>()
 
             Log.d("Uid Login user", TokenStorage.load(context).uid)
@@ -130,7 +143,7 @@ class ChatViewModel(
                 userContact
             }
         }
-    }
+//    }
 
     fun onSend(message: String) {
         uiScope.launch {
@@ -148,20 +161,7 @@ class ChatViewModel(
                     }
                 })
 
-            withContext(Dispatchers.IO) {
-                val lastMessage = database.getUserMessage()!!
-                val fid: String
-                val contact: String
-                if(lastMessage.uid == uid) {
-                    fid = lastMessage.contact_fid
-                    contact = lastMessage.contact_name
-                }
-                else {
-                    fid = lastMessage.uid_fid
-                    contact = lastMessage.uid_name
-                }
-                FirebaseWebService.notifyUser(fid, uid.toString(), contact, message)
-            }
+            FirebaseWebService.notifyUser(contactFID, uid.toString(), myUsername, message)
         }
     }
 
