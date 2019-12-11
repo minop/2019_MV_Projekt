@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019, The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Data to make available to the XML via data binding. In this case,
+ the whole ViewModel, so that we can access the LiveData,
+ click handlers, and state variables. -->
+    <data>
+
+        <variable
+            name="appRoomViewModel"
+            type="com.example.messagingappmv.screens.room.AppRoomViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".screens.room.AppRoomFragment">
+
+        <!--        <ImageView-->
+        <!--            android:id="@+id/quality_image"-->
+        <!--            android:layout_width="@dimen/icon_size"-->
+        <!--            android:layout_height="@dimen/icon_size"-->
+        <!--            android:layout_marginStart="8dp"-->
+        <!--            android:layout_marginTop="56dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            app:sleepImage="@{sleepDetailViewModel.night}"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/sleep_length"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="20dp"-->
+        <!--            android:layout_marginStart="8dp"-->
+        <!--            android:layout_marginTop="32dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/quality_string"-->
+        <!--            app:sleepDurationFormatted="@{sleepDetailViewModel.night}" />-->
+
+        <!--        <Button-->
+        <!--            android:id="@+id/send_button"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginEnd="29dp"-->
+        <!--            android:layout_marginBottom="16dp"-->
+        <!--            android:text="@string/send"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent" />-->
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/room_posts"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/send_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.506" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/send_button"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="16dp"
+            app:backgroundTint="#3F51B5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/editTextPostRoom"
+            app:srcCompat="@drawable/ic_send_24pxwhite" />
+
+        <Button
+            android:id="@+id/clear_button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="274dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="49dp"
+            android:text="@string/clear"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <!--        android:onClick="@{() -> contactListViewModel.onClear()}"-->
+
+
+        <EditText
+            android:id="@+id/editTextPostRoom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxHeight="300dp"
+            android:maxLines="5"
+            android:minWidth="270dp"
+            android:minLines="1"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/send_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/room_posts" />
+
+
+        <!--        <EditText-->
+        <!--            android:id="@+id/editTextPostRoom"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="32dp"-->
+        <!--            android:layout_marginTop="5dp"-->
+        <!--            android:layout_marginEnd="10dp"-->
+        <!--            android:layout_marginBottom="5dp"-->
+        <!--            android:ems="10"-->
+        <!--            android:inputType="textAutoCorrect|textMultiLine|textPersonName|textImeMultiLine"-->
+        <!--            android:maxLength="100"-->
+        <!--            android:maxLines="5"-->
+        <!--            android:singleLine="false"-->
+        <!--            android:text="@string/textPost"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toStartOf="@+id/send_button"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/user_posts" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/textView"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="177dp"-->
+        <!--            android:layout_marginTop="27dp"-->
+        <!--            android:layout_marginEnd="176dp"-->
+        <!--            android:text="Posts for user: "-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/name_string"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="20dp"-->
+        <!--            android:layout_marginStart="20dp"-->
+        <!--            android:layout_marginTop="25dp"-->
+        <!--            android:layout_marginEnd="20dp"-->
+        <!--            android:minWidth="50dp"-->
+        <!--            android:visibility="visible"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintHorizontal_bias="0.498"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/textView"-->
+        <!--        />-->
+        <!--        app:nameString="@{roomViewModel.newUserContact}"-->
+
+
+        <!--        <Button-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="8dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            android:layout_marginBottom="32dp"-->
+        <!--            android:onClick="@{() -> roomViewModel.onClose()}"-->
+        <!--            android:text="@string/back"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent" />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
