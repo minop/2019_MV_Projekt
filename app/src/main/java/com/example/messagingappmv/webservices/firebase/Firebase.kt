@@ -2,13 +2,14 @@ package com.example.messagingappmv.webservices.firebase
 
 import android.util.Log
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class Firebase : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
-        Log.d("Firebase", "Refreshed token: $token")
-        CavojskyWebService.updateFirebaseToken(token, this.baseContext)
+       if(TokenStorage.containsToken(this.baseContext))
+            CavojskyWebService.updateFirebaseToken(token, this.baseContext)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

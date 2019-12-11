@@ -30,6 +30,10 @@ object TokenStorage {
         }
     }
 
+    fun containsToken(context: Context): Boolean {
+        return this.safeLoad(context) != null
+    }
+
     fun delete(context: Context) {
         this.write("", context)
     }
