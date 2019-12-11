@@ -9,4 +9,8 @@
         android:id="@+id/roomListFragment"
         android:icon="@android:drawable/btn_star_big_on"
         android:title="RoomListFragment" />
+    <item
+        android:id="@+id/loginFragment"
+        android:icon="@android:drawable/ic_lock_idle_lock"
+        android:title="Logout" />
 </menu>
