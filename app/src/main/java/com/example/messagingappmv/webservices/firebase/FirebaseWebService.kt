@@ -1,8 +1,12 @@
 package com.example.messagingappmv.webservices.firebase
 
+import android.content.Context
+import android.util.Log
 import com.example.messagingappmv.webservices.WebserviceTask
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.firebase.requestbodies.MessageData
 import com.example.messagingappmv.webservices.firebase.requestbodies.MessageRequest
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -40,5 +44,16 @@ object FirebaseWebService {
 
     fun subscribeToRoom(roomSSID: String) {
         FirebaseMessaging.getInstance().subscribeToTopic(roomSSID)
+    }
+
+    fun forceTokenRegistration(context: Context) {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            if(!task.isSuccessful) {
+                Log.e("Firebase", "getInstanceId failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            CavojskyWebService.updateFirebaseToken(task.result!!.token, context)
+        }
     }
 }
