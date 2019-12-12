@@ -176,8 +176,8 @@ class RoomDiffCallback : DiffUtil.ItemCallback<DataItem>() {
 }
 
 
-class RoomListener(val clickListener: (myRoomId: String) -> Unit) {
-    fun onClick(userPosts: UserPosts) = clickListener(userPosts.room_id)
+class RoomListener(val clickListener: (myPost: UserPosts) -> Unit) {
+    fun onClick(userPosts: UserPosts) = clickListener(userPosts)
 }
 
 sealed class DataItem {

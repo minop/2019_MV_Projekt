@@ -23,9 +23,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.messagingappmv.database.UserContact
-import com.example.messagingappmv.database.UserPosts
-import com.example.messagingappmv.database.UserPostsDatabaseDao
+import com.example.messagingappmv.database.*
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomReadItem
@@ -42,6 +40,7 @@ import kotlinx.coroutines.*
 class RoomViewModel(
     private val roomContactKey: String = "",
     dataSource: UserPostsDatabaseDao,
+    userDataSource: UserContactDatabaseDao,
     application: Application
 
 ) : ViewModel(), FirebaseRoomEventListener {
@@ -55,6 +54,7 @@ class RoomViewModel(
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
+    val userDatabase = userDataSource
 
     /** Coroutine setup variables */
 
@@ -81,6 +81,22 @@ class RoomViewModel(
         initializeRoomContact()
 
         FirebaseEventManager.addRoomListener(this)
+    }
+
+    fun postClickListener(userPost: UserPosts){
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                if (userDatabase.get(userPost.uid) == null) {
+                    CavojskyWebService.sendMessageToContact(
+                        userPost.uid.toString(),
+                        "Hello, we are connected now!",
+                        context!!,
+                        {
+                            onChatClicked(userPost.uid)
+                        })
+                }
+            }
+        }
     }
 
     private fun initializeRoomContact() {
@@ -135,6 +151,18 @@ class RoomViewModel(
             }
             roomContact
         }
+    }
+
+    private val _navigateToChat = MutableLiveData<Long>()
+    val navigateToChat
+        get() = _navigateToChat
+
+    fun onChatClicked(userId: Long) {
+        _navigateToChat.value = userId
+    }
+
+    fun onChatNavigated() {
+        _navigateToChat.value = null
     }
 
     fun onSend(post: String) {

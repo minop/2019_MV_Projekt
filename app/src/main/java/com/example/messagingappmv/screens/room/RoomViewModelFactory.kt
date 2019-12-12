@@ -29,12 +29,13 @@ import com.example.messagingappmv.database.UserPostsDatabaseDao
 class RoomViewModelFactory(
     private val roomContactKey: String,
     private val dataSource: UserPostsDatabaseDao,
+    private val userDataSource: UserContactDatabaseDao,
     private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RoomViewModel::class.java)) {
-            return RoomViewModel(roomContactKey, dataSource, application) as T
+            return RoomViewModel(roomContactKey, dataSource, userDataSource, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

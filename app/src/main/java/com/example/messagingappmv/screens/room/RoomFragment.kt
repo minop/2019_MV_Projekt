@@ -11,12 +11,15 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messagingappmv.MainActivity
 import com.example.messagingappmv.R
 import com.example.messagingappmv.database.RoomContactDatabase
+import com.example.messagingappmv.database.UserDatabase
 import com.example.messagingappmv.databinding.FragmentRoomBinding
+import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.ui.GPHSettings
@@ -28,6 +31,8 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_chat.*
 import kotlinx.android.synthetic.main.fragment_room.*
 import kotlinx.android.synthetic.main.fragment_room.send_button
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class RoomFragment : Fragment() {
@@ -53,8 +58,9 @@ class RoomFragment : Fragment() {
 
         // Create an instance of the ViewModel Factory.
         val dataSource = RoomContactDatabase.getInstance(application).userPostsDatabaseDao
+        val userDataSource = UserDatabase.getInstance(application).userContactDatabaseDao
         val viewModelFactory =
-            RoomViewModelFactory(arguments.roomContactKey, dataSource, application)
+            RoomViewModelFactory(arguments.roomContactKey, dataSource, userDataSource, application)
 
         // Get a reference to the ViewModel associated with this fragment.
         userPostsViewModel =
@@ -66,9 +72,8 @@ class RoomFragment : Fragment() {
         // give the binding object a reference to it.
         binding.roomViewModel = userPostsViewModel
 
-        val adapter = RoomAdapter(uid, arguments.roomContactKey, RoomListener { id ->
-            Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
-            userPostsViewModel.onRoomContactClicked(id)
+        val adapter = RoomAdapter(uid, arguments.roomContactKey, RoomListener { userPost ->
+            userPostsViewModel.postClickListener(userPost)
         })
         binding.userPosts.adapter = adapter
 
@@ -103,6 +108,19 @@ class RoomFragment : Fragment() {
         userPostsViewModel.allUserPosts.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.addHeaderAndSubmitList(it)
+            }
+        })
+
+        userPostsViewModel.navigateToChat.observe(this, Observer { data ->
+            if(data != null) {
+                id?.let {
+
+                    this.findNavController().navigate(
+                        RoomFragmentDirections
+                            .actionRoomFragmentToChatFragment(data)
+                    )
+                    userPostsViewModel.onChatNavigated()
+                }
             }
         })
 
