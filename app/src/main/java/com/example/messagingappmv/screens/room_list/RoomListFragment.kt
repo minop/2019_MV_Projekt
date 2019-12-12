@@ -35,8 +35,7 @@ class RoomListFragment : Fragment() {
     ): View? {
 
         // Check if the user is logged in and redirect them if not
-        // TODO this should be moved to whichever screen becomes the home screen
-        if (TokenStorage.safeLoad(this.context!!) == null)
+        if (!TokenStorage.containsToken(this.context!!))
             this.findNavController().navigate(R.id.action_roomListFragment_to_loginFragment)
 
         // Get a reference to the binding object and inflate the fragment views.
