@@ -29,6 +29,9 @@ import com.example.messagingappmv.database.UserPostsDatabaseDao
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomReadItem
+import com.example.messagingappmv.webservices.firebase.FirebaseWebService
+import com.example.messagingappmv.webservices.firebase.events.FirebaseEventManager
+import com.example.messagingappmv.webservices.firebase.events.FirebaseRoomEventListener
 import kotlinx.coroutines.*
 
 /**
@@ -41,7 +44,14 @@ class RoomViewModel(
     dataSource: UserPostsDatabaseDao,
     application: Application
 
-) : ViewModel() {
+) : ViewModel(), FirebaseRoomEventListener {
+    override fun onFirebaseRoomEvent(roomSSID: String) {
+        uiScope.launch {
+            if(roomSSID == roomContactKey)
+                getUserPostsFromDatabase()
+        }
+    }
+
     private val context = application.applicationContext
     private val uid: Long = TokenStorage.load(context).uid.toLong()
     val database = dataSource
@@ -64,10 +74,13 @@ class RoomViewModel(
 
     fun onRoomContactClicked(id: String) {
         _navigateToRoom.value = id
+
     }
 
     init {
         initializeRoomContact()
+
+        FirebaseEventManager.addRoomListener(this)
     }
 
     private fun initializeRoomContact() {
@@ -125,6 +138,8 @@ class RoomViewModel(
 
     fun onSend(post: String) {
         uiScope.launch {
+            FirebaseWebService.subscribeToRoom(roomContactKey)
+
             val newPost = UserPosts()
             newPost.uid = uid
             newPost.post = post
@@ -138,6 +153,8 @@ class RoomViewModel(
                         database.insert(newPost)
                     }
                 })
+            FirebaseWebService.notifyRoom(roomContactKey, uid.toString(), post)
+
         }
     }
 
