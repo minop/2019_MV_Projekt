@@ -87,6 +87,7 @@ class RoomViewModel(
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 if (userDatabase.get(userPost.uid) == null) {
+                    userDatabase.insert(UserContact(userPost.uid, userPost.userName))
                     CavojskyWebService.sendMessageToContact(
                         userPost.uid.toString(),
                         "Hello, we are connected now!",
