@@ -70,6 +70,9 @@ interface UserPostsDatabaseDao {
     @Query("SELECT * FROM user_posts WHERE (uid = :uid AND room_id = :room_id) ORDER BY id DESC")
     fun getAllUserPosts(uid: Long, room_id: String): LiveData<List<UserPosts>>
 
+    @Query("SELECT * FROM user_posts WHERE (room_id = :room_id) ORDER BY id DESC")
+    fun getAllPostsFromRoom(room_id: String): LiveData<List<UserPosts>>
+
     /**
      * Selects and returns the latest record.
      */

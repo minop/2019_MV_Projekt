@@ -65,7 +65,7 @@ class RoomViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private var newUserPosts = MutableLiveData<UserPosts?>()
-    val allUserPosts = database.getAllUserPosts(uid, roomContactKey)
+    val allUserPosts = database.getAllPostsFromRoom(roomContactKey)
 
     /**
      * Navigation for the Chat fragment.
