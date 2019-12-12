@@ -91,7 +91,8 @@ class RoomListViewModel(
 
     private fun initializeRoomContact() {
         uiScope.launch {
-            newRoomContact.value = getRoomContactFromDatabase()
+            if(TokenStorage.containsToken(context))
+                newRoomContact.value = getRoomContactFromDatabase()
         }
     }
 
@@ -215,7 +216,7 @@ class RoomListViewModel(
     fun attemptAddCurrentWifi(ssid: String, bssid: String, context: Context) {
         uiScope.launch {
             val localRoom = get(ssid)
-            if(localRoom == null) {
+            if(localRoom == null && TokenStorage.containsToken(context)) {
                 //add the room to the database
                 if(ssid == ""){
                     insert(RoomContact(bssid))
