@@ -101,6 +101,7 @@ class RoomViewModel(
             for (item: RoomReadItem in posts) {
                 val tmpRoomContact = UserPosts(
                     item.uid.toLong(),
+                    item.name,
                     item.roomid,
                     item.message
                 )

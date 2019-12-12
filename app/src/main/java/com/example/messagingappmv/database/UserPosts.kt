@@ -12,6 +12,9 @@ data class UserPosts(
     @ColumnInfo(name = "uid")
     var uid: Long = 0L,
 
+    @ColumnInfo(name = "userName")
+    var userName: String = "",
+
     @ColumnInfo(name = "room_id")
     var room_id: String = "",
 

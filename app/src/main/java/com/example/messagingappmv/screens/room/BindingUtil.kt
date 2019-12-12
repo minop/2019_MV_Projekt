@@ -15,3 +15,10 @@ fun TextView.setNameString(item: UserPosts?) {
         text = item.post
     }
 }
+
+@BindingAdapter("userNameString")
+fun TextView.setuserNameString(item: UserPosts?) {
+    item?.let {
+        text = item.userName
+    }
+}
