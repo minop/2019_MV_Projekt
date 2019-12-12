@@ -33,13 +33,14 @@ import kotlinx.android.synthetic.main.fragment_room.send_button
 class RoomFragment : Fragment() {
     private lateinit var userPostsViewModel: RoomViewModel
     private lateinit var manager: LinearLayoutManager
+    private lateinit var binding: FragmentRoomBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Get a reference to the binding object and inflate the fragment views.
-        val binding: FragmentRoomBinding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_room, container, false
         )
 
@@ -144,7 +145,7 @@ class RoomFragment : Fragment() {
             imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
         }
 
-        send_gif_button.setOnClickListener {
+        binding.sendGifButton.setOnClickListener {
             val settings =
                 GPHSettings(gridType = GridType.waterfall, theme = LightTheme, dimBackground = true)
             val gifsDialog = GiphyDialogFragment.newInstance(settings)

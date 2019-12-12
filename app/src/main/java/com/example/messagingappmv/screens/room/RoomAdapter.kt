@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RoomAdapter(    
+class RoomAdapter(
     private val uid: Long,
     private val roomid: String,
     val clickListener: RoomListener
@@ -24,9 +24,9 @@ class RoomAdapter(
     private val ITEM_VIEW_TYPE_TEXT_USER = 1
     private val ITEM_VIEW_TYPE_IMAGE_CONTACT = 2
     private val ITEM_VIEW_TYPE_IMAGE_USER = 3
-    
+
     private val adapterScope = CoroutineScope(Dispatchers.Default)
-    
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ViewHolderTextUser -> {
@@ -67,7 +67,7 @@ class RoomAdapter(
             }
         }
     }
-    
+
     override fun getItemViewType(position: Int): Int {
         val post = getItem(position).post
         if (post != "") {
@@ -176,27 +176,24 @@ class RoomDiffCallback : DiffUtil.ItemCallback<DataItem>() {
 }
 
 
-class RoomListener(val clickListener: (userId: Long) -> Unit) {
-    fun onClick(userMessages: UserPosts) = clickListener(userMessages.id)
+class RoomListener(val clickListener: (myRoomId: String) -> Unit) {
+    fun onClick(userPosts: UserPosts) = clickListener(userPosts.room_id)
 }
 
 sealed class DataItem {
     abstract val id: Long
     abstract val uid: Long
-    abstract val roomid: String
     abstract val post: String
 
     data class UserPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
-        override val roomid = userPost.room_id
         override val post = userPost.post
     }
 
     data class ContactPost(val userPost: UserPosts) : DataItem() {
         override val id = userPost.id
         override val uid = userPost.uid
-        override val roomid = userPost.room_id
         override val post = userPost.post
     }
 }

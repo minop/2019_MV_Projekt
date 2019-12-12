@@ -60,9 +60,9 @@ class RoomViewModel(
     /**
      * Navigation for the Chat fragment.
      */
-    private val _navigateToRoom = MutableLiveData<Long>()
+    private val _navigateToRoom = MutableLiveData<String>()
 
-    fun onRoomContactClicked(id: Long) {
+    fun onRoomContactClicked(id: String) {
         _navigateToRoom.value = id
     }
 

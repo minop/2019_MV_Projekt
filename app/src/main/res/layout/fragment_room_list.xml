@@ -19,13 +19,6 @@
         android:layout_height="match_parent"
         tools:context=".screens.room_list.RoomListFragment">
 
-        <!-- This lesson we will switch to RecyclerView to properly
-         display the sleep data-->
-
-        <!-- With data binding and LiveData, we can track the buttons' visibility states
-             from the ViewModel. The click handler is in the ViewModel as well, and
-             you can set it for the Views using this lambda pattern. -->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/room_contact_list"
             android:layout_width="350dp"

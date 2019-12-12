@@ -99,6 +99,21 @@
             app:layout_constraintStart_toEndOf="@+id/editTextPostRoom"
             app:srcCompat="@drawable/ic_send_24pxwhite" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/send_gif_button"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom|center|right|center_horizontal|center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="13dp"
+            android:baselineAlignBottom="false"
+            android:foregroundGravity="center_vertical|center|center_horizontal"
+            android:textAlignment="center"
+            app:backgroundTint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/gph_ic_search_pink" />
+
         <Button
             android:id="@+id/clear_button2"
             android:layout_width="wrap_content"

@@ -26,7 +26,6 @@ import kotlinx.android.synthetic.main.fragment_room_list.start_button
 import kotlinx.android.synthetic.main.fragment_room_list.*
 
 class RoomListFragment : Fragment() {
-
     private lateinit var roomListViewModel: RoomListViewModel
 
     override fun onCreateView(
@@ -34,20 +33,19 @@ class RoomListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view =  super.onCreateView(inflater, container, savedInstanceState)
 
         // Check if the user is logged in and redirect them if not
         // TODO this should be moved to whichever screen becomes the home screen
         if (TokenStorage.safeLoad(this.context!!) == null)
             this.findNavController().navigate(R.id.action_roomListFragment_to_loginFragment)
 
-//        return view
-
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentRoomListBinding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_room_list, container, false)
 
         val application = requireNotNull(this.activity).application
+
+        //Set Title of ActionBar
         (activity as MainActivity).supportActionBar?.title = getString(R.string.room_list_title)
 
         // Create an instance of the ViewModel Factory.
@@ -82,29 +80,17 @@ class RoomListFragment : Fragment() {
         // This is necessary so that the binding can observe LiveData updates.
         binding.setLifecycleOwner(this)
 
-        // Add an Observer on the state variable for showing a Snackbar message
-        // when the CLEAR button is pressed.
-        roomListViewModel.showSnackBarEvent.observe(this, Observer {
-            if (it == true) { // Observed state is true.
-                Snackbar.make(
-                    activity!!.findViewById(android.R.id.content),
-                    getString(R.string.cleared_message),
-                    Snackbar.LENGTH_SHORT // How long to display the message.
-                ).show()
-                // Reset state to make sure the toast is only shown once, even if the device
-                // has a configuration change.
-                roomListViewModel.doneShowingSnackbar()
-            }
-        })
-
         // Add an Observer on the state variable for Navigating when and item is clicked.
         roomListViewModel.navigateToRoom.observe(this, Observer { data ->
-            id?.let {
+            if(data != null) {
+                id?.let {
 
-                this.findNavController().navigate(
-                    RoomListFragmentDirections
-                        .actionRoomListFragmentToRoomFragment(data))
-                roomListViewModel.onRoomNavigated()
+                    this.findNavController().navigate(
+                        RoomListFragmentDirections
+                            .actionRoomListFragmentToRoomFragment(data)
+                    )
+                    roomListViewModel.onRoomNavigated()
+                }
             }
         })
 
@@ -114,15 +100,8 @@ class RoomListFragment : Fragment() {
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        roomListViewModel.attemptAddCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
-        start_button.setOnClickListener{
-            Log.d("Message", "In Listener")
-            roomListViewModel.onSend(roomListViewModel.getCurrentBssid(this.context!!).toString())
-            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view?.applicationWindowToken, 0)
-            room_contact_list.smoothScrollToPosition(0)
-        }
-    }
+override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    roomListViewModel.attemptAddCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
+}
 }

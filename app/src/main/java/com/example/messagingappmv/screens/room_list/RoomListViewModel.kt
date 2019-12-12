@@ -24,8 +24,10 @@ import android.content.Context.CONNECTIVITY_SERVICE
 import android.os.Build
 import android.net.NetworkCapabilities
 import android.net.Network
+import android.os.AsyncTask
 import androidx.core.content.ContextCompat.getSystemService
 import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
+import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
 import com.example.messagingappmv.webservices.cavojsky.responsebodies.RoomListItem
 import java.time.LocalDateTime
 
@@ -35,9 +37,10 @@ import java.time.LocalDateTime
  */
 class RoomListViewModel(
     dataSource: RoomContactDatabaseDao,
-    application: Application) : ViewModel() {
+    application: Application
+) : ViewModel() {
 
-
+    private val context = application.applicationContext
     /**
      * Hold a reference to SleepDatabase via SleepDatabaseDao.
      */
@@ -66,33 +69,9 @@ class RoomListViewModel(
 
     val roomContactList = database.getAllRoomContact()
 
+    
     /**
-     * Request a toast by setting this value to true.
-     *
-     * This is private because we don't want to expose setting this value to the Fragment.
-     */
-    private var _showSnackbarEvent = MutableLiveData<Boolean?>()
-
-    /**
-     * If this is true, immediately `show()` a toast and call `doneShowingSnackbar()`.
-     */
-    val showSnackBarEvent: LiveData<Boolean?>
-        get() = _showSnackbarEvent
-
-
-    /**
-     * Call this immediately after calling `show()` on a toast.
-     *
-     * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
-     * toast.
-     */
-    fun doneShowingSnackbar() {
-        _showSnackbarEvent.value = null
-    }
-
-
-    /**
-     * Navigation for the Chat fragment.
+     * Navigation for the Room fragment.
      */
     private val _navigateToRoom = MutableLiveData<String>()
     val navigateToRoom
@@ -124,13 +103,29 @@ class RoomListViewModel(
      *  recording.
      */
     private suspend fun getRoomContactFromDatabase(): RoomContact? {
+        val userList = mutableListOf<RoomContact>()
+
+        Log.d("Uid Login user", TokenStorage.load(context).uid)
+
+        CavojskyWebService.listRooms(context, { rooms ->
+            Log.d("RoomListItem", rooms.toString())
+            for (item: RoomListItem in rooms) {
+                var tmpRoomContaxt = RoomContact()
+                tmpRoomContaxt = RoomContact(item.roomid)
+                userList.add(tmpRoomContaxt)
+            }
+            AsyncTask.execute { database.insertAll(userList) }
+
+            Log.d("RoomListItem", userList.toString())
+        })
+
         return withContext(Dispatchers.IO) {
 
-            var roomContact = database.getRoomContact()
-            if (roomContact?.ssid == roomContact?.ssid) {
-                roomContact = null
+            var userContact = database.getRoomContact()
+            if (userContact?.ssid == userContact?.ssid) {
+                userContact = null
             }
-            roomContact
+            userContact
         }
     }
 
@@ -144,12 +139,6 @@ class RoomListViewModel(
         return withContext(Dispatchers.IO) {
             var roomContact = database.get(ssid)
             roomContact
-        }
-    }
-
-    private suspend fun update(roomContact: RoomContact) {
-        withContext(Dispatchers.IO) {
-            database.update(roomContact)
         }
     }
 
@@ -222,15 +211,6 @@ class RoomListViewModel(
         return bssid
     }
 
-    fun onSend(message: String) {
-        uiScope.launch {
-            val newRoom = RoomContact()
-            newRoom.ssid = message
-            insert(newRoom)
-            newRoomContact.value = getRoomContactFromDatabase()
-        }
-    }
-
     //checks if the wifi the user is currently on (if he is on any) is in the database. if it's not, add it.
     fun attemptAddCurrentWifi(ssid: String, bssid: String, context: Context) {
         uiScope.launch {
@@ -263,6 +243,8 @@ class RoomListViewModel(
         }
     }
 
+
+
     /**
      * Executes when the CLEAR button is clicked.
      */
@@ -273,9 +255,6 @@ class RoomListViewModel(
 
             // And clear tonight since it's no longer in the database
             newRoomContact.value = null
-
-            // Show a snackbar message, because it's friendly.
-            _showSnackbarEvent.value = true
         }
     }
 
@@ -288,5 +267,13 @@ class RoomListViewModel(
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+    fun onSend(message: String) {
+        uiScope.launch {
+            val newRoom = RoomContact()
+            newRoom.ssid = message
+            insert(newRoom)
+            newRoomContact.value = getRoomContactFromDatabase()
+        }
     }
 }

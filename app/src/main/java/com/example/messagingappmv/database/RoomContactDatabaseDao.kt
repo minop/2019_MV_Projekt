@@ -1,10 +1,7 @@
 package com.example.messagingappmv.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -13,6 +10,9 @@ interface RoomContactDatabaseDao {
 
     @Insert
     fun insert(room: RoomContact)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll( rooms: List<RoomContact>)
 
     @Update
     fun update(room: RoomContact)

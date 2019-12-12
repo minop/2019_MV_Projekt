@@ -73,7 +73,7 @@
             app:destination="@id/chatFragment" />
         <argument
             android:name="roomContactKey"
-            app:argType="String" />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
