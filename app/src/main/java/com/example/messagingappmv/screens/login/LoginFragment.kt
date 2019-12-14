@@ -39,9 +39,8 @@ class LoginFragment : Fragment() {
             this.findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
         viewModel.logedIn.observe(this, Observer {
-            (activity as DrawerMenuLocker).setDrawerLocked(it)
-            
-            Log.d("LogedIn", "User successfully loged")
+            (activity as DrawerMenuLocker).setDrawerLocked(it, binding.username.text.toString(), context!!)
+            Log.d("LogedIn", binding.username.text.toString())
         })
 
         return binding.root
