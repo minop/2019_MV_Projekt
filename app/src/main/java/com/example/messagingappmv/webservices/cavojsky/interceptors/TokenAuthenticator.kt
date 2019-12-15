@@ -17,7 +17,7 @@ class TokenAuthenticator(val context: Context) : Authenticator {
 
             val tokenResponse = CavojskyWebService.refreshTokens(loginData.uid, loginData.refreshToken, context)
 
-            TokenStorage.save(LoginData(tokenResponse.uid, tokenResponse.access, tokenResponse.refresh), context)
+            TokenStorage.save(LoginData(loginData.username, tokenResponse.uid, tokenResponse.access, tokenResponse.refresh), context)
 
             return response.request.newBuilder().header("Authorization", "Bearer ${tokenResponse.access}").build()
         }

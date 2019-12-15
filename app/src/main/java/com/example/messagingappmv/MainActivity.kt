@@ -3,22 +3,12 @@ package com.example.messagingappmv
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.messagingappmv.databinding.ActivityMainBinding
-import com.example.messagingappmv.webservices.cavojsky.CavojskyWebService
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
-import com.giphy.sdk.core.models.Media
-import com.giphy.sdk.ui.GPHSettings
-import com.giphy.sdk.ui.GiphyCoreUI
-import com.giphy.sdk.ui.themes.GridType
-import com.giphy.sdk.ui.themes.LightTheme
-import com.giphy.sdk.ui.views.GiphyDialogFragment
 import kotlinx.android.synthetic.main.list_item_room_users_contact.view.*
 
 class MainActivity : AppCompatActivity(), DrawerMenuLocker {
@@ -44,13 +34,13 @@ class MainActivity : AppCompatActivity(), DrawerMenuLocker {
         return NavigationUI.navigateUp(navController, drawerLayout)
     }
 
-    override fun setDrawerLocked(shouldLock: Boolean, username: String, context: Context) {
+    override fun setDrawerLocked(shouldLock: Boolean, context: Context) {
         if(shouldLock){
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         }else{
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             val headerText = binding.navView.getHeaderView(0).user_name
-            headerText.text = username
+            headerText.text = TokenStorage.load(context).username
         }
     }
 }
