@@ -59,11 +59,11 @@ class RoomListFragment : Fragment() {
         // To use the View Model with data binding, you have to explicitly
         // give the binding object a reference to it.
         binding.roomListViewModel = roomListViewModel
-
+        val currentWifi = roomListViewModel.getCurrentWifi(context!!)
         val adapter = RoomListAdapter(RoomListListener { id ->
             Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
             roomListViewModel.onRoomContactClicked(id)
-        })
+        }, currentWifi)
         binding.roomContactList.adapter = adapter
 
 
@@ -101,6 +101,5 @@ class RoomListFragment : Fragment() {
 
 override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    roomListViewModel.attemptAddCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
 }
 }

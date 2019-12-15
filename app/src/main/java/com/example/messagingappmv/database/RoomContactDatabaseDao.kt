@@ -21,7 +21,7 @@ interface RoomContactDatabaseDao {
     fun get(mySsid: String): RoomContact
 
     @Query("SELECT * FROM room_contact_list ORDER BY ssid DESC")
-    fun getAllRoomContact(): LiveData<List<RoomContact>>
+    fun getAllRoomContact(): LiveData<MutableList<RoomContact>>
 
     /**
      * Selects and returns the latest record.
