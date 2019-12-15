@@ -101,5 +101,7 @@ class RoomListFragment : Fragment() {
 
 override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    roomListViewModel.addCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
+    roomListViewModel.addPublicWifi(this.context!!)
 }
 }

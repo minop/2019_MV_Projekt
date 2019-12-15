@@ -16,7 +16,6 @@ import kotlinx.coroutines.withContext
 
 class RoomAdapter(
     private val uid: Long,
-    private val roomid: String,
     val clickListener: RoomListener
 ) :
     ListAdapter<DataItem, RecyclerView.ViewHolder>(RoomDiffCallback()) {

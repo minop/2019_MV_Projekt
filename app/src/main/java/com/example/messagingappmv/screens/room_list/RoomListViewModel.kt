@@ -68,6 +68,7 @@ class RoomListViewModel(
     private var newRoomContact = MutableLiveData<RoomContact?>()
 
     val roomContactList = database.getAllRoomContact()
+
     
     /**
      * Navigation for the Room fragment.
@@ -211,42 +212,20 @@ class RoomListViewModel(
         return bssid
     }
 
-    fun getCurrentWifi(context: Context): RoomContact{
-        val ssid = getCurrentSsid(context)
-        val bssid = getCurrentBssid(context)
-        var currentWifi = RoomContact()
-        if(ssid != ""){
-            currentWifi.ssid = ssid!!
-        }
-        else if(bssid != ""){
-            currentWifi.ssid = bssid!!
-        }
-        return currentWifi
-    }
-
     //checks if the wifi the user is currently on (if he is on any) is in the database. if it's not, add it.
-    fun attemptAddCurrentWifi(context: Context) {
-        if(!roomContactList.value.isNullOrEmpty()){
-            var addCurrentWifi = true
-            val currentWifi = getCurrentWifi(context)
-            for(room in roomContactList.value!!){
-                if(room.ssid == currentWifi.ssid){
-                    addCurrentWifi = false
+    fun addCurrentWifi(ssid: String, bssid: String, context: Context) {
+        uiScope.launch {
+            val localRoom = get(ssid)
+            if(localRoom == null && TokenStorage.containsToken(context)) {
+                //add the room to the database
+                if(ssid == ""){
+                    insert(RoomContact(bssid))
                 }
+                else{
+                    insert(RoomContact(ssid))
+                }
+                newRoomContact.value = getRoomContactFromDatabase()
             }
-        }
-//        uiScope.launch {
-//            val localRoom = get(ssid)
-//            if(localRoom == null && TokenStorage.containsToken(context)) {
-//                //add the room to the database
-//                if(ssid == ""){
-//                    insert(RoomContact(bssid))
-//                }
-//                else{
-//                    insert(RoomContact(ssid))
-//                }
-//                newRoomContact.value = getRoomContactFromDatabase()
-//            }
 //            if(localRoom == null) {
 //                //v lokalnej databaze sa room nenachadza. ak sa nenachadza ani na webservice tak
 //                CavojskyWebService.listRooms(context) {
@@ -262,10 +241,18 @@ class RoomListViewModel(
 //                    }
 //                }
 //            }
-//        }
+        }
     }
 
-
+    fun addPublicWifi(context: Context){
+        uiScope.launch {
+            val ssid = "XsTDHS3C2YneVmEW5Ry7"
+            val publicRoom = get(ssid)
+            if(publicRoom == null && TokenStorage.containsToken(context)) {
+                insert(RoomContact())
+            }
+        }
+    }
 
     /**
      * Executes when the CLEAR button is clicked.

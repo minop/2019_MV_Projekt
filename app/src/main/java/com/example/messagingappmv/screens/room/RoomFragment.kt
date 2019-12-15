@@ -72,34 +72,34 @@ class RoomFragment : Fragment() {
         // give the binding object a reference to it.
         binding.roomViewModel = userPostsViewModel
 
-        val adapter = RoomAdapter(uid, arguments.roomContactKey, RoomListener { userPost ->
+        val adapter = RoomAdapter(uid, RoomListener { userPost ->
             userPostsViewModel.postClickListener(userPost)
         })
         binding.userPosts.adapter = adapter
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
-                user_posts.scrollToPosition(0)
+//                user_posts.scrollToPosition(0)
                 Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
             }
 
             override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                user_posts.scrollToPosition(0)
+//                user_posts.scrollToPosition(0)
                 Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
             }
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                user_posts.scrollToPosition(0)
+//                user_posts.scrollToPosition(0)
                 Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
             }
 
             override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                user_posts.scrollToPosition(0)
+//                user_posts.scrollToPosition(0)
                 Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
             }
 
             override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-                user_posts.scrollToPosition(0)
+//                user_posts.scrollToPosition(0)
                 Toast.makeText(context, R.string.added_new_message, Toast.LENGTH_LONG).show()
             }
         })
