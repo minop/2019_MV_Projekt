@@ -41,7 +41,7 @@ object CavojskyWebService {
         WebserviceTask<RegistrationResponse>(
             { response ->
                 TokenStorage.save(
-                    LoginData(response!!.uid, response.access, response.refresh),
+                    LoginData(username, response!!.uid, response.access, response.refresh),
                     context
                 )
                 callback.invoke()
@@ -55,7 +55,7 @@ object CavojskyWebService {
     fun login(username: String, password: String, context: Context, callback: () -> Unit = {}, callbackError: () -> Unit = {}) {
         WebserviceTask<LoginResponse>(
             { response ->
-                TokenStorage.save(LoginData(response!!.uid, response.access, response.refresh), context)
+                TokenStorage.save(LoginData(username, response!!.uid, response.access, response.refresh), context)
                 callback.invoke()
             }, callbackError
         ).execute(

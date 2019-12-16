@@ -1,13 +1,16 @@
 package com.example.messagingappmv.screens.login
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.example.messagingappmv.DrawerMenuLocker
 import com.example.messagingappmv.R
 import com.example.messagingappmv.databinding.FragmentLoginBinding
 import com.example.messagingappmv.webservices.cavojsky.interceptors.TokenStorage
@@ -35,6 +38,10 @@ class LoginFragment : Fragment() {
         binding.buttonSignup.setOnClickListener {
             this.findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
+        viewModel.logedIn.observe(this, Observer {
+            (activity as DrawerMenuLocker).setDrawerLocked(it, context!!)
+            Log.d("LogedIn", binding.username.text.toString())
+        })
 
         return binding.root
     }

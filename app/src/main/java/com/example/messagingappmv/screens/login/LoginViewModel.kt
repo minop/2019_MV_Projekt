@@ -11,6 +11,7 @@ import com.example.messagingappmv.webservices.firebase.FirebaseWebService
 class LoginViewModel : ViewModel() {
     val username = MutableLiveData<String>()
     val password = MutableLiveData<String>()
+    val logedIn = MutableLiveData<Boolean>()
 
     val error = MutableLiveData<String>()
 
@@ -18,15 +19,19 @@ class LoginViewModel : ViewModel() {
         username.value = ""
         password.value = ""
         error.value = ""
+        logedIn.value = true
     }
 
     fun login(context: Context, navController: NavController) {
         error.value = ""
+
         CavojskyWebService.login(username.value!!, password.value!!, context, {
             FirebaseWebService.forceTokenRegistration(context)
             navController.navigate(R.id.action_loginFragment_to_roomListFragment)
+            logedIn.value = false
         }, {
             error.value = "login failed"
+            logedIn.value = true
         })
     }
 }
