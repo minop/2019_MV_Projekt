@@ -69,9 +69,8 @@ class RoomListFragment : Fragment() {
 
         roomListViewModel.roomContactList.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it)
+                adapter.addHeaderAndSubmitList(it)
                 room_contact_list.smoothScrollToPosition(0)
-
             }
         })
 
@@ -101,7 +100,6 @@ class RoomListFragment : Fragment() {
 
 override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    roomListViewModel.addCurrentWifi(roomListViewModel.getCurrentSsid(this.context!!).toString(), roomListViewModel.getCurrentBssid(this.context!!).toString(), this.context!!)
     roomListViewModel.addPublicWifi(this.context!!)
 }
 }

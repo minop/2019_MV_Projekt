@@ -41,7 +41,7 @@
             android:layout_marginEnd="29dp"
             android:layout_marginBottom="16dp"
             android:text="@string/send"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -69,7 +69,7 @@
             android:ems="10"
             android:inputType="text"
             android:text="@string/roomName"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/start_button"
             app:layout_constraintStart_toStartOf="parent" />
